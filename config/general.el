@@ -20,3 +20,6 @@
 (straight-use-package 'undo-tree)
 (global-undo-tree-mode)
 
+;; Projectile
+(straight-use-package 'projectile)
+(projectile-mode +1)

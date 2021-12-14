@@ -169,12 +169,18 @@
   "xP" 'unfill-paragraph
   "xC" 'capitalize-word
   "xL" 'downcase-word
-  "xB" 'sp-splice-sexp
 )
 ;; Substitution
 (leader-set-keys
   "s" '(:ignore t :wk "subsitute")
   "se" '(evil-iedit-state/iedit-mode)
+  "sr" 'sp-rewrap-sexp
+  "sd" 'sp-splice-sexp
+)
+
+;; Projectile
+(leader-set-keys
+  "/" 'projectile-grep
 )
 
 ;; TeX

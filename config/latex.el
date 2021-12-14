@@ -74,6 +74,17 @@
 
 (setq reftex-bibliography-commands '("bibliography" "nobibliography" "addbibresource"))
 
+;; Automatically include a tilde `~' before a citation.
+(setq reftex-format-cite-function 
+  '(lambda (key fmt)
+     (let ((cite (replace-regexp-in-string "%l" key fmt)))
+       (if (or (= ?~ (string-to-char fmt))
+               (member (preceding-char) '(?\ ?\t ?\n ?~ ?{ ?,))
+               (member (following-char) '(?} ))
+     )
+           cite
+         (concat "~" cite)))))
+
 ;; LatexMk
 (straight-use-package 'auctex-latexmk)
 (setq auctex-latexmk-inherit-TeX-PDF-mode t)
