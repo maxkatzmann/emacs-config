@@ -60,6 +60,11 @@
 (setq bibtex-autokey-titleword-separator "")
 (setq bibtex-autokey-year-title-separator "-")
 
+;; Enable line numbers in bibtex mode by default.
+(add-hook 'bibtex-mode-hook (lambda ()
+                              (display-line-numbers-mode)
+                              (setq display-line-numbers 'relative)))
+
 ;; Sentences should end with double spaces.
 (setq sentence-end-double-space t)
 
