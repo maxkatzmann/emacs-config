@@ -9,7 +9,8 @@
 ;; Disable bread crumbs.
 (setq lsp-headerline-breadcrumb-enable nil)
 
-;; Enable LSP in TeX mode
+;; Enable LSP in different mode
 (add-hook 'TeX-mode-hook #'lsp)
 (add-hook 'ess-r-mode-hook #'lsp)
+(add-hook 'elm-mode-hook #'lsp)
 

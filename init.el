@@ -23,6 +23,7 @@
 ;; Load configs.
 (add-to-list 'load-path "~/.emacs.d/config/")
 (load-library "completion")
+(load-library "elm")
 (load-library "git")
 (load-library "latex")
 (load-library "general")

@@ -8,7 +8,7 @@
 ;; (setq fira-code-mode-disabled-ligatures '("x" ":" "..." ".." "%%" "::"))
 
 ;; change the font
-(setq nano-font-family-monospaced "SF Mono")
+(setq nano-font-family-monospaced "Roboto Mono")
 ;; (setq nano-font-family-monospaced "Fira Code")
 
 ;; nano disables font-lock, which we reenable because it's nice.
