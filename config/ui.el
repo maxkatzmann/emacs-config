@@ -16,3 +16,15 @@
 
 ;; Highlight current line.
 (global-hl-line-mode 1)
+
+;; Use SVG Tags
+(straight-use-package 'svg-tag-mode)
+(require 'svg-tag-mode)
+(setq svg-tag-tags
+      '(("\\todo" . ((lambda (tag)
+                                (svg-tag-make "TODO" :radius 3 :inverse t :font-size 14.0))))))
+(add-hook 'prog-mode-hook (lambda ()
+                            (svg-tag-mode t)))
+(add-hook 'text-mode-hook (lambda ()
+                            (svg-tag-mode t)))
+

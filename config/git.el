@@ -11,3 +11,7 @@
 ;; Make it so magit shows changes within lines and not the original block
 ;; vs. the new block.
 (setq magit-diff-refine-hunk (quote all))
+
+;; Update diff-hl indicators after before and after magit refreshes.
+(add-hook 'magit-pre-refresh-hook 'diff-hl-magit-pre-refresh)
+(add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)

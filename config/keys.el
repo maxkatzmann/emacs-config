@@ -124,6 +124,7 @@
   "gh" 'diff-hl-show-hunk
   "gn" 'diff-hl-next-hunk
   "gr" 'diff-hl-revert-hunk
+  "gc" 'diff-hl-show-hunk-copy-original-text
 )
 
 ;; Jumping
