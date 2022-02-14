@@ -10,3 +10,7 @@
 (straight-use-package 'amx)
 (require 'amx)
 (amx-mode)
+
+;; Company
+(straight-use-package 'company)
+(require 'company)

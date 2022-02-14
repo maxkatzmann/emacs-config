@@ -22,6 +22,7 @@
 
 ;; Load configs.
 (add-to-list 'load-path "~/.emacs.d/config/")
+(load-library "bazel")
 (load-library "completion")
 (load-library "elm")
 (load-library "git")
@@ -33,3 +34,5 @@
 (load-library "ui")
 
 (load-library "lsp")
+(load-library "python-lang")
+(load-library "cpp-lang")

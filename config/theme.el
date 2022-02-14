@@ -24,7 +24,7 @@
                '(width      . 81)
                '(vertical-scroll-bars . nil)
                '(internal-border-width . 24)
-               '(left-fringe    . 5)
+               '(left-fringe    . 8)
                '(right-fringe   . 5)
                '(tool-bar-lines . 0)
                '(menu-bar-lines . 0))))

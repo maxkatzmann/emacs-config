@@ -22,9 +22,10 @@
 (require 'svg-tag-mode)
 (setq svg-tag-tags
       '(("\\todo" . ((lambda (tag)
-                                (svg-tag-make "TODO" :radius 3 :inverse t :font-size 14.0))))))
+                       (svg-tag-make "TODO" :radius 3 :inverse t :font-size 14.0))))
+        ("TODO" . ((lambda (tag)
+                       (svg-tag-make "TODO" :radius 3 :inverse t :font-size 14.0))))))
 (add-hook 'prog-mode-hook (lambda ()
                             (svg-tag-mode t)))
 (add-hook 'text-mode-hook (lambda ()
                             (svg-tag-mode t)))
-
