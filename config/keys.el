@@ -125,6 +125,11 @@
   "gn" 'diff-hl-next-hunk
   "gr" 'diff-hl-revert-hunk
   "gc" 'diff-hl-show-hunk-copy-original-text
+  "gm" '(:ignore t :wk "merge")
+  "gmn" 'smerge-next
+  "gmp" 'smerge-prev
+  "gmc" 'smerge-keep-current
+  "gmo" 'smerge-keep-other
 )
 
 ;; Jumping
@@ -210,3 +215,8 @@
 (leader-set-keys-for-major-mode 'ess-r-mode "c" 'ess-eval-buffer)
 (leader-set-keys-for-major-mode 'ess-r-mode "=" 'lsp-format-buffer)
 
+;; Python
+(leader-set-keys-for-major-mode 'python-mode "=" 'yapfify-buffer)
+
+;; Bazel
+(leader-set-keys-for-major-mode 'bazel-mode "=" 'bazel-buildifier)
