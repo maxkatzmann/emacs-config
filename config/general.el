@@ -23,3 +23,7 @@
 ;; Projectile
 (straight-use-package 'projectile)
 (projectile-mode +1)
+
+;; Writeroom
+(straight-use-package 'writeroom-mode)
+(require 'writeroom-mode)

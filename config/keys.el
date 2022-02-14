@@ -128,6 +128,7 @@
   "gm" '(:ignore t :wk "merge")
   "gmn" 'smerge-next
   "gmp" 'smerge-prev
+  "gma" 'smerge-keep-all
   "gmc" 'smerge-keep-current
   "gmo" 'smerge-keep-other
 )
@@ -187,6 +188,19 @@
 ;; Projectile
 (leader-set-keys
   "/" 'projectile-grep
+)
+
+;; Org
+(leader-set-keys
+  "o" '(:ignore t :wk "org-roam")
+  "oa" '(:ignore t :wk "agenda")
+  "oat" 'org-todo-list
+  "oas" 'org-schedule
+  "ob" 'org-roam-buffer-toggle
+  "of" 'org-roam-node-find
+  "oin" 'org-roam-node-insert
+  "oit" 'org-insert-todo-heading
+  "ot" 'org-todo
 )
 
 ;; TeX

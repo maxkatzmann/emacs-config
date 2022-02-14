@@ -29,6 +29,7 @@
 (load-library "latex")
 (load-library "general")
 (load-library "keys")
+(load-library "org")
 (load-library "r")
 (load-library "theme")
 (load-library "ui")
