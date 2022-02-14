@@ -184,6 +184,19 @@
   "/" 'projectile-grep
 )
 
+;; Org
+(leader-set-keys
+  "o" '(:ignore t :wk "org-roam")
+  "oa" '(:ignore t :wk "agenda")
+  "oat" 'org-todo-list
+  "oas" 'org-schedule
+  "ob" 'org-roam-buffer-toggle
+  "of" 'org-roam-node-find
+  "oin" 'org-roam-node-insert
+  "oit" 'org-insert-todo-heading
+  "ot" 'org-todo
+)
+
 ;; TeX
 (leader-set-keys-for-major-mode 'latex-mode "c" 'latex/build)
 (leader-set-keys-for-major-mode 'latex-mode "b" 'TeX-command-master)
@@ -209,4 +222,3 @@
 (leader-set-keys-for-major-mode 'ess-r-mode "s" 'R)
 (leader-set-keys-for-major-mode 'ess-r-mode "c" 'ess-eval-buffer)
 (leader-set-keys-for-major-mode 'ess-r-mode "=" 'lsp-format-buffer)
-
