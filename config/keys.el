@@ -218,6 +218,7 @@
   "oa" '(:ignore t :wk "agenda")
   "oat" 'org-todo-list
   "oal" 'org-agenda-list
+  "oar" 'org-agenda-refresh
   "ob" 'org-roam-buffer-toggle
   "of" 'org-roam-node-find
 )

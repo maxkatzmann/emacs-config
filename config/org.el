@@ -5,10 +5,18 @@
 (org-roam-db-autosync-mode)
 
 ;; org-agenda
-(setq org-agenda-files (directory-files-recursively "~/Documents/org-roam/" "\\.org$"))
+(defun org-agenda-refresh ()
+  (interactive)
+  (setq org-agenda-files (directory-files-recursively "~/Documents/org-roam/" "\\.org$")))
+(org-agenda-refresh)
 
 ;; Mark done todos with a time stamp.
 (setq org-log-done 'time)
+
+;; TODO keywords
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "|" "DONE(d!)")
+        (sequence "LATER(l)" "NEXT(n)" "WAITING(w)" "ACTIVE(a)" "|" "COMPLETED(c)")))
 
 ;; evil org
 (straight-use-package 'evil-org)
