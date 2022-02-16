@@ -105,10 +105,14 @@
   "wd" 'delete-window
   "wv" 'split-and-follow-vertically
   "ws" 'split-and-follow-horizontally
-  "wl" 'windmove-right
-  "wh" 'windmove-left
-  "wj" 'windmove-down
-  "wk" 'windmove-up
+  "wl" 'evil-window-right
+  "wL" 'evil-window-move-far-right
+  "wh" 'evil-window-left
+  "wH" 'evil-window-move-far-left
+  "wj" 'evil-window-down
+  "wJ" 'evil-window-move-very-bottom
+  "wk" 'evil-window-up
+  "wK" 'evil-window-move-very-top
 )
 
 ;; Zoom
@@ -176,6 +180,7 @@
   "xP" 'unfill-paragraph
   "xC" 'capitalize-word
   "xL" 'downcase-word
+  "xT" 'titlecase-region
 )
 ;; Substitution
 (leader-set-keys
@@ -195,13 +200,21 @@
   "o" '(:ignore t :wk "org-roam")
   "oa" '(:ignore t :wk "agenda")
   "oat" 'org-todo-list
-  "oas" 'org-schedule
+  "oal" 'org-agenda-list
   "ob" 'org-roam-buffer-toggle
   "of" 'org-roam-node-find
-  "oin" 'org-roam-node-insert
-  "oit" 'org-insert-todo-heading
-  "ot" 'org-todo
 )
+(leader-set-keys-for-major-mode 'org-mode "t" 'org-todo)
+(leader-set-keys-for-major-mode 'org-mode "s" 'org-schedule)
+(leader-set-keys-for-major-mode 'org-mode "L" 'org-shiftright)
+(leader-set-keys-for-major-mode 'org-mode "H" 'org-shiftleft)
+(leader-set-keys-for-major-mode 'org-mode "K" 'org-shiftup)
+(leader-set-keys-for-major-mode 'org-mode "J" 'org-shiftdown)
+(leader-set-keys-for-major-mode 'org-mode "J" 'org-shiftdown)
+(leader-set-keys-for-major-mode 'org-mode "S" 'org-sort-entries)
+(leader-set-keys-for-major-mode 'org-mode "it" 'org-insert-todo-heading)
+(leader-set-keys-for-major-mode 'org-mode "in" 'org-roam-node-insert)
+
 
 ;; TeX
 (leader-set-keys-for-major-mode 'latex-mode "c" 'latex/build)

@@ -27,3 +27,7 @@
 ;; Writeroom
 (straight-use-package 'writeroom-mode)
 (require 'writeroom-mode)
+
+;; Title case
+(straight-use-package 'titlecase)
+(require 'titlecase)

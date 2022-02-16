@@ -23,7 +23,7 @@
 
 (defconst date-re "[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}")
 (defconst time-re "[0-9]\\{2\\}:[0-9]\\{2\\}")
-(defconst day-re "[A-Za-z]\\{3\\}")
+(defconst day-re "[A-Za-z]\\{2,3\\}")
 
 (defun svg-progress-percent (value)
   (svg-image (svg-lib-concat
