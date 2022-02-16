@@ -31,3 +31,7 @@
 ;; Title case
 (straight-use-package 'titlecase)
 (require 'titlecase)
+
+;; Helpful
+(straight-use-package 'helpful)
+(require 'helpful)

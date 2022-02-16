@@ -2,6 +2,9 @@
 (setq mac-option-modifier 'alt)
 (global-set-key (kbd "A-<backspace>") 'backward-kill-word)
 
+;; Make ESC quit prompts
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
 ;; evil
 (setq evil-want-keybinding nil) ;; Required for evil-collection
 (straight-use-package 'evil)
@@ -100,6 +103,11 @@
   (balance-windows)
   (other-window 1))
 
+(defun split-to-term ()
+  (interactive)
+  (split-and-follow-horizontally)
+  (switch-to-buffer "*terminal*"))
+
 (leader-set-keys
   "w" '(:ignore t :wk "window")
   "wd" 'delete-window
@@ -113,6 +121,7 @@
   "wJ" 'evil-window-move-very-bottom
   "wk" 'evil-window-up
   "wK" 'evil-window-move-very-top
+  "wt" 'split-to-term
 )
 
 ;; Zoom
@@ -141,6 +150,14 @@
 (leader-set-keys
   "j" '(:ignore t :wk "jump")
   "ji" 'lsp-ivy-workspace-symbol
+)
+
+;; Help
+(leader-set-keys
+  "h" '(:ignore t :wk "hel")
+  "hv" 'helpful-variable
+  "hf" 'helpful-function
+  "ht" 'helpful-at-point
 )
 
 ;; Comments
