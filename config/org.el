@@ -10,8 +10,9 @@
   (setq org-agenda-files (directory-files-recursively "~/Documents/org-roam/" "\\.org$")))
 (org-agenda-refresh)
 
-;; Mark done todos with a time stamp.
-(setq org-log-done 'time)
+;; Disable state-change logging for todo items.
+(setq org-log-done nil)
+(setq org-log-repeat nil)
 
 ;; TODO keywords
 (setq org-todo-keywords
