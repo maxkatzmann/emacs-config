@@ -45,8 +45,8 @@
 (setq svg-tag-tags
       `(
         ;; Org tags
-        (":\\([A-Za-z0-9]+\\)" . ((lambda (tag) (svg-tag-make tag))))
-        (":\\([A-Za-z0-9]+[ \-]\\)" . ((lambda (tag) tag)))
+        ;; (":\\([A-Za-z0-9]+\\)" . ((lambda (tag) (svg-tag-make tag))))
+        ;; (":\\([A-Za-z0-9]+[ \-]\\)" . ((lambda (tag) tag)))
         
         ;; Task priority
         ("\\[#[A-Z]\\]" . ( (lambda (tag)
@@ -61,6 +61,9 @@
         
         ;; TODO / DONE
         ("TODO" . ((lambda (tag) (svg-tag-make "TODO" :face 'org-todo :inverse t :font-size 14.0 :margin 0))))
+        ("LATER" . ((lambda (tag) (svg-tag-make "LATER" :face 'org-todo :inverse t :font-size 14.0 :margin 0))))
+        ("WAITING" . ((lambda (tag) (svg-tag-make "WAITING" :face 'org-todo :inverse t :font-size 14.0 :margin 0))))
+        ("NEXT" . ((lambda (tag) (svg-tag-make "NEXT" :face 'org-todo :inverse t :font-size 14.0 :margin 0))))
         ("DONE" . ((lambda (tag) (svg-tag-make "DONE" :face 'org-done :font-size 14.0 :margin 0))))
         ("\\todo" . ((lambda (tag) (svg-tag-make "TODO" :radius 3 :inverse t :font-size 14.0))))
 
