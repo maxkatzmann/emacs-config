@@ -39,6 +39,9 @@
 (straight-use-package 'evil-iedit-state)
 (require 'evil-iedit-state)
 
+;; Use swiper for search.
+(define-key evil-normal-state-map "/" 'swiper)
+
 ;; spacemode
 (straight-use-package 'dash)
 (straight-use-package 'general)
