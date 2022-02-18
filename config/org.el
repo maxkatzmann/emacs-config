@@ -10,14 +10,13 @@
   (setq org-agenda-files (directory-files-recursively "~/Documents/org-roam/" "\\.org$")))
 (org-agenda-refresh)
 
-;; Disable state-change logging for todo items.
-(setq org-log-done nil)
-(setq org-log-repeat nil)
-
 ;; TODO keywords
 (setq org-todo-keywords
       '((sequence "TODO(t)" "|" "DONE(d!)")
         (sequence "LATER(l)" "NEXT(n)" "WAITING(w)" "ACTIVE(a)" "|" "COMPLETED(c)")))
+
+;; Hide state log after changing the state of a todo entry.
+(advice-add 'org-todo :after #'hide-subtree)
 
 ;; evil org
 (straight-use-package 'evil-org)
