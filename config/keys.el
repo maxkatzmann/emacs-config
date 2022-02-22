@@ -207,6 +207,12 @@
   "sd" 'sp-splice-sexp
 )
 
+;; eval
+(leader-set-keys
+  "e" '(:ignore t :wk "eval")
+  "es" 'eval-last-sexp
+)
+
 ;; Projectile
 (leader-set-keys
   "/" 'projectile-grep
@@ -217,12 +223,27 @@
   "o" '(:ignore t :wk "org-roam")
   "oa" '(:ignore t :wk "agenda")
   "oat" 'org-todo-list
+  "oaT" 'org-todo-list-TODO
+  "oaN" 'org-todo-list-NEXT
+  "oaL" 'org-todo-list-LATER
+  "oaW" 'org-todo-list-WAITING
   "oal" 'org-agenda-list
   "oar" 'org-agenda-refresh
   "ob" 'org-roam-buffer-toggle
   "of" 'org-roam-node-find
 )
+
+(defun org-fold-all-task-entries ()
+  "Close/fold all entries marked that represent tasks."
+  (interactive)
+  (save-excursion
+    (goto-char (point-max))
+    (while (outline-previous-heading)
+      (when (or (org-entry-is-todo-p) (org-entry-is-done-p))
+        (hide-entry)))))
+
 (leader-set-keys-for-major-mode 'org-mode "t" 'org-todo)
+(leader-set-keys-for-major-mode 'org-mode "f" 'org-fold-all-task-entries)
 (leader-set-keys-for-major-mode 'org-mode "s" 'org-schedule)
 (leader-set-keys-for-major-mode 'org-mode "L" 'org-shiftright)
 (leader-set-keys-for-major-mode 'org-mode "H" 'org-shiftleft)

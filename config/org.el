@@ -15,9 +15,6 @@
       '((sequence "TODO(t)" "|" "DONE(d!)")
         (sequence "LATER(l)" "NEXT(n)" "WAITING(w)" "ACTIVE(a)" "|" "COMPLETED(c)")))
 
-;; Hide state log after changing the state of a todo entry.
-(advice-add 'org-todo :after #'hide-subtree)
-
 ;; evil org
 (straight-use-package 'evil-org)
 (require 'evil-org)
@@ -38,3 +35,22 @@
 ;; org-notifications
 (straight-use-package 'org-notifications)
 (org-notifications-start)
+
+;; Functions for quick access to specific TODO lists.
+
+(defun org-todo-list-LATER ()
+  (interactive)
+  (org-todo-list "LATER"))
+
+(defun org-todo-list-NEXT ()
+  (interactive)
+  (org-todo-list "NEXT"))
+
+(defun org-todo-lieft-TODO ()
+  (interactive)
+  (org-todo-list "WAITING"))
+
+(defun org-todo-list-WAITING ()
+  (interactive)
+  (org-todo-list "WAITING"))
+
