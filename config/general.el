@@ -35,3 +35,9 @@
 ;; Helpful
 (straight-use-package 'helpful)
 (require 'helpful)
+
+;; Exec path from shell -> to make sure that locale is set correctly,
+;; which is required by magit.
+(straight-use-package 'exec-path-from-shell)
+(require 'exec-path-from-shell)
+(exec-path-from-shell-copy-envs '("LANG" "LC_ALL" "LC_CTYPES"))
