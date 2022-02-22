@@ -3,8 +3,9 @@
 (scroll-bar-mode -1)
 
 ;; Line numbers
-(add-hook 'prog-mode-hook (lambda () (setq display-line-numbers 'relative)))
-(add-hook 'text-mode-hook (lambda () (setq display-line-numbers 'relative)))
+(global-display-line-numbers-mode t)
+(setq display-line-numbers-type 'relative)
+(add-hook 'term-mode-hook (lambda () (display-line-numbers-mode 0)))
 
 ;; Line spacing
 (setq-default line-spacing 2)
