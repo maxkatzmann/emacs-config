@@ -52,7 +52,7 @@
 
 (leader-set-keys
   "TAB" '(switch-to-last-buffer+ :wk "last-buffer")
-  "SPC" '(execute-extended-command :wk "M-x")
+  "SPC" '(counsel-M-x :wk "M-x")
   "<escape>" 'abort-recursive-edit
   "DEL"      'exit-recursive-edit
 )

@@ -18,6 +18,10 @@
 ;; Highlight current line.
 (global-hl-line-mode 1)
 
+;; Rainbow delimiters
+(straight-use-package 'rainbow-delimiters)
+(add-hook 'prog-mode-hook (lambda () (rainbow-delimiters-mode)))
+
 ;; Use SVG Tags
 (straight-use-package 'svg-tag-mode)
 (require 'svg-tag-mode)
