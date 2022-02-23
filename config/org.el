@@ -54,3 +54,11 @@
   (interactive)
   (org-todo-list "WAITING"))
 
+
+;; Add custom heights to org-mode section titles
+(defun font-height-org-mode-hook ()
+  "Stop the org-level headers from increasing in height relative to the other text."
+  (set-face-attribute 'org-level-1 nil :height 1.3)
+  (set-face-attribute 'org-level-2 nil :height 1.2))
+
+(add-hook 'org-mode-hook #'font-height-org-mode-hook)
