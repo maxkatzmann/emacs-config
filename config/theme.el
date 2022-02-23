@@ -52,11 +52,17 @@
    (cond ((string= nano-theme-var "light")
           (progn (nano-theme-set-dark)
                  (nano-refresh-theme)
-                 (setq nano-theme-var "dark")))
+                 (setq nano-theme-var "dark")
+                 ;; Make sure org font sizes are updated after refreshing the
+                 ;; theme.
+                 (font-height-org-mode-hook)))
           ((string= nano-theme-var "dark")
           (progn (nano-theme-set-light)
                  (nano-refresh-theme)
-                 (setq nano-theme-var "light")))
+                 (setq nano-theme-var "light")
+                 ;; Make sure org font sizes are updated after refreshing the
+                 ;; theme.
+                 (font-height-org-mode-hook)))
           (t nil)))
 
 (nano-theme-set-light)
