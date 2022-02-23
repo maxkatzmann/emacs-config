@@ -257,7 +257,8 @@
 (leader-set-keys-for-major-mode 'org-mode "S" 'org-sort-entries)
 (leader-set-keys-for-major-mode 'org-mode "it" 'org-insert-todo-heading)
 (leader-set-keys-for-major-mode 'org-mode "in" 'org-roam-node-insert)
-
+(leader-set-keys-for-major-mode 'org-mode "il" 'org-insert-link)
+(leader-set-keys-for-major-mode 'org-mode "o" 'org-open-at-point)
 
 ;; TeX
 (leader-set-keys-for-major-mode 'latex-mode "c" 'latex/build)
