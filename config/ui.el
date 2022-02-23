@@ -85,10 +85,13 @@
                                                               :crop-left t))))
 
         
-        ;; Active date (without day name, with or without time)
+        ;; Active date (variants with/without day name, with/without time)
         (,(format "\\(<%s>\\)" date-re) .
          ((lambda (tag)
             (svg-tag-make tag :beg 1 :end -1 :font-size 14.0 :margin 0))))
+        (,(format "\\(<%s %s>\\)" date-re day-re) .
+         ((lambda (tag)
+            (svg-tag-make tag :beg 1 :end -1 :inverse nil :font-size 14.0 :margin 0))))
         (,(format "\\(<%s %s *\\)%s>" date-re day-re time-re) .
          ((lambda (tag)
             (svg-tag-make tag :beg 1 :inverse nil :crop-right t :font-size 14.0 :margin 0))))
