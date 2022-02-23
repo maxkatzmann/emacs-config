@@ -47,3 +47,8 @@
   (setq dired-use-ls-dired t
         insert-directory-program "/usr/local/bin/gls"
         dired-listing-switches "-aBhl --group-directories-first"))
+
+;; Window resizing
+(straight-use-package 'cycle-resize)
+(require 'cycle-resize)
+(setq cycle-resize-steps '(75 50 25 50))

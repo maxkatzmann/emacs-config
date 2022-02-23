@@ -126,6 +126,8 @@
   "wk" 'evil-window-up
   "wK" 'evil-window-move-very-top
   "wt" 'split-to-term
+  "wS" 'cycle-resize-window-vertically
+  "wV" 'cycle-resize-window-horizontally
 )
 
 ;; Zoom
