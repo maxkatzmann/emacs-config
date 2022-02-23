@@ -77,6 +77,7 @@
   "bn" 'next-buffer
   "bp" 'previous-buffer
   "bs" 'create-scratch-buffer
+  "br" 'revert-buffer
 )
 
 ;; Files
