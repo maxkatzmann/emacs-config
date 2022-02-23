@@ -41,3 +41,9 @@
 (straight-use-package 'exec-path-from-shell)
 (require 'exec-path-from-shell)
 (exec-path-from-shell-copy-envs '("LANG" "LC_ALL" "LC_CTYPES"))
+
+;; Dired
+(when (string= system-type "darwin")
+  (setq dired-use-ls-dired t
+        insert-directory-program "/usr/local/bin/gls"
+        dired-listing-switches "-aBhl --group-directories-first"))
