@@ -1,5 +1,8 @@
-;; ivy
+;; counsel
+(straight-use-package 'counsel)
+(require 'counsel)
 
+;; ivy
 (straight-use-package 'ivy)
 (require 'ivy)
 (ivy-mode)
@@ -9,7 +12,6 @@
 (straight-use-package 'ivy-rich)
 (ivy-rich-mode 1)
 
-(straight-use-package 'counsel)
 (straight-use-package 'amx)
 (require 'amx)
 (amx-mode)

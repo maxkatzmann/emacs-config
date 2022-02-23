@@ -46,9 +46,9 @@
   (interactive)
   (org-todo-list "NEXT"))
 
-(defun org-todo-lieft-TODO ()
+(defun org-todo-list-TODO ()
   (interactive)
-  (org-todo-list "WAITING"))
+  (org-todo-list "TODO"))
 
 (defun org-todo-list-WAITING ()
   (interactive)
