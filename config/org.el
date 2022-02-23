@@ -4,6 +4,13 @@
 (setq org-roam-directory (file-truename "~/Documents/org-roam"))
 (org-roam-db-autosync-mode)
 
+;; Overwrite default capture template
+(setq org-roam-capture-templates
+      '(("d" "default" plain "%?"
+         :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" ":PROPERTIES:\n:ID: %(org-id-new)\n:LOGGING: nil\n:END:\n#+title: ${title}\n")
+         :unnarrowed t)
+        ))
+
 ;; org-agenda
 (defun org-agenda-refresh ()
   (interactive)
@@ -60,5 +67,7 @@
   "Stop the org-level headers from increasing in height relative to the other text."
   (set-face-attribute 'org-level-1 nil :height 1.3)
   (set-face-attribute 'org-level-2 nil :height 1.2))
-
 (add-hook 'org-mode-hook #'font-height-org-mode-hook)
+
+;; Disable folding double empty lines
+(setq org-cycle-separator-lines -2)
