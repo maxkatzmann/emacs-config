@@ -234,6 +234,7 @@
   "oaL" 'org-todo-list-LATER
   "oaW" 'org-todo-list-WAITING
   "oal" 'org-agenda-list
+  "oac" 'cfw:open-org-calendar
   "oar" 'org-agenda-refresh
   "ob" 'org-roam-buffer-toggle
   "of" 'org-roam-node-find

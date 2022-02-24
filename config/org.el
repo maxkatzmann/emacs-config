@@ -71,3 +71,25 @@
 
 ;; Disable folding double empty lines
 (setq org-cycle-separator-lines -2)
+
+;; Calendar for agenda.
+(straight-use-package 'calfw)
+(require 'calfw)
+(straight-use-package 'calfw-org)
+(require 'calfw-org)
+
+;; Unicode characters
+(setq cfw:fchar-junction ?╋
+      cfw:fchar-vertical-line ?┃
+      cfw:fchar-horizontal-line ?━
+      cfw:fchar-left-junction ?┣
+      cfw:fchar-right-junction ?┫
+      cfw:fchar-top-junction ?┯
+      cfw:fchar-top-left-corner ?┏
+      cfw:fchar-top-right-corner ?┓)
+
+;; Open week view by default.
+(defun my--cfw:open-calendar-buffer-view (orig-func &rest args &allow-other-keys)
+  (apply orig-func :view 'week :allow-other-keys t args)
+  )
+(advice-add 'cfw:open-calendar-buffer :around #'my--cfw:open-calendar-buffer-view)
