@@ -71,7 +71,7 @@
 
 (leader-set-keys
   "b" '(:ignore t :wk "buffers")
-  "bb" 'counsel-switch-buffer
+  "bb" 'switch-to-buffer
   "bd" 'kill-this-buffer
   "bm" 'buffer-menu
   "bn" 'next-buffer
