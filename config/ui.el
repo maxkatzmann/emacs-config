@@ -22,6 +22,29 @@
 (straight-use-package 'rainbow-delimiters)
 (add-hook 'prog-mode-hook (lambda () (rainbow-delimiters-mode)))
 
+;; Icons
+(straight-use-package 'all-the-icons)
+(when (display-graphic-p)
+  (require 'all-the-icons))
+;; Make sure to install the fonts:
+;; M-x all-the-icons-install-fonts
+
+;; Icons in dired
+(straight-use-package 'all-the-icons-dired)
+(when (display-graphic-p)
+  (require 'all-the-icons-dired)
+  (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
+
+;; All the icons in ivy
+(straight-use-package 'all-the-icons-ivy)
+(when (display-graphic-p)
+  (require 'all-the-icons-ivy)
+  (all-the-icons-ivy-setup)
+  (setq all-the-icons-ivy-buffer-commands '())
+  (setq all-the-icons-ivy-file-commands
+      '(counsel-find-file counsel-switch-buffer)))
+
+
 ;; Use SVG Tags
 (straight-use-package 'svg-tag-mode)
 (require 'svg-tag-mode)
