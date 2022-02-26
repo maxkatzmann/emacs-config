@@ -1,21 +1,20 @@
 ;; counsel
-(straight-use-package 'counsel)
-(require 'counsel)
+(use-package counsel)
 
 ;; ivy
-(straight-use-package 'ivy)
-(require 'ivy)
-(ivy-mode)
-(setq ivy-use-virtual-buffers t)
-(setq enable-recursive-minibuffers t)
+(use-package ivy
+  :config
+  (ivy-mode)
+  (setq ivy-use-virtual-buffers t)
+  (setq enable-recursive-minibuffers t))
 
-(straight-use-package 'ivy-rich)
-(ivy-rich-mode 1)
+(use-package ivy-rich
+  :config
+  (ivy-rich-mode 1))
 
-(straight-use-package 'amx)
-(require 'amx)
-(amx-mode)
+(use-package amx
+  :config
+  (amx-mode))
 
 ;; Company
-(straight-use-package 'company)
-(require 'company)
+(use-package company)

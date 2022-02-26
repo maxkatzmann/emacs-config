@@ -1,7 +1,7 @@
 (require 'cl-lib)
 
 (straight-use-package 'auctex)
-(straight-use-package 'ivy-bibtex)
+(use-package ivy-bibtex)
 
 ;; TeX Distribution
 (setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin/"))
@@ -26,7 +26,7 @@
                            (setq fill-column 70)))
 
 ;; Bibtex
-(straight-use-package 'org-ref)
+(use-package org-ref)
 
 ;; Bibtex key generation.
 (setq bibtex-autokey-before-presentation-function
@@ -91,11 +91,12 @@
          (concat "~" cite)))))
 
 ;; LatexMk
-(straight-use-package 'auctex-latexmk)
-(setq auctex-latexmk-inherit-TeX-PDF-mode t)
-(auctex-latexmk-setup)
-(setq TeX-command-default "LatexMk")
-(setq latex-build-command "LatexMk")
+(use-package auctex-latexmk
+  :config
+  (setq auctex-latexmk-inherit-TeX-PDF-mode t)
+  (auctex-latexmk-setup)
+  (setq TeX-command-default "LatexMk")
+  (setq latex-build-command "LatexMk"))
 
 ;; Build command that uses latexmk.
 (defun latex/build ()

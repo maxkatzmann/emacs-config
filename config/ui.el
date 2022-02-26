@@ -19,12 +19,12 @@
 (global-hl-line-mode 1)
 
 ;; Rainbow delimiters
-(straight-use-package 'rainbow-delimiters)
-(add-hook 'prog-mode-hook (lambda () (rainbow-delimiters-mode)))
+(use-package rainbow-delimiters
+  :config
+  (add-hook 'prog-mode-hook (lambda () (rainbow-delimiters-mode))))
 
 ;; Use SVG Tags
-(straight-use-package 'svg-tag-mode)
-(require 'svg-tag-mode)
+(use-package svg-tag-mode)
 
 (defconst date-re "[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}")
 (defconst time-re "[0-9]\\{2\\}:[0-9]\\{2\\}")

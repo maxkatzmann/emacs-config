@@ -1,10 +1,9 @@
-(straight-use-package 'python-mode)
-(require 'python-mode)
+(use-package python-mode)
 
-(straight-use-package 'company-jedi)
-(straight-use-package 'lsp-pyright)
-(straight-use-package 'importmagic)
-(straight-use-package 'yapfify)
+(use-package company-jedi)
+(use-package lsp-pyright)
+(use-package importmagic)
+(use-package yapfify)
 
 (add-hook 'python-mode-hook (lambda ()
                               (setq lsp-headerline-breadcrumb-enable nil)

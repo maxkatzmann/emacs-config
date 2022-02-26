@@ -13,7 +13,11 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-(setq package-enable-at-startup nil)
+
+;; use-package
+(straight-use-package 'use-package)
+(use-package straight
+             :custom (straight-use-package-by-default t))
 
 ;; Nano
 (straight-use-package

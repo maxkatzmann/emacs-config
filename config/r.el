@@ -1,8 +1,8 @@
-(straight-use-package 'ess)
-(straight-use-package 'ess-view-data)
+(use-package ess)
+(use-package ess-view-data)
 
-(require 'ess-r-mode)
-(require 'ess-view-data)
+;; (require 'ess-r-mode)
+;; (require 'ess-view-data)
 
 (setq ess-r-backend 'lsp)
 
