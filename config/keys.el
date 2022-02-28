@@ -47,6 +47,9 @@
 ;; Use swiper for search.
 (define-key evil-normal-state-map "/" 'swiper)
 
+;; Hydra for transient states.
+(use-package hydra)
+
 ;; spacemode
 (use-package dash)
 (use-package general)
@@ -117,6 +120,15 @@
   (split-and-follow-horizontally)
   (switch-to-buffer "*terminal*"))
 
+;; Transient state for window resizing
+(defhydra transient-window-resize-vertically (:timeout 4)
+  "resize window vertically"
+  ("S" cycle-resize-window-vertically "resize vertically"))
+
+(defhydra transient-window-resize-horizontally (:timeout 4)
+  "resize window vertically"
+  ("V" cycle-resize-window-horizontally "resize horizontally"))
+
 (leader-set-keys
   "w" '(:ignore t :wk "window")
   "wd" 'delete-window
@@ -131,8 +143,8 @@
   "wk" 'evil-window-up
   "wK" 'evil-window-move-very-top
   "wt" 'split-to-term
-  "wS" 'cycle-resize-window-vertically
-  "wV" 'cycle-resize-window-horizontally
+  "wS" 'transient-window-resize-vertically/body
+  "wV" 'transient-window-resize-horizontally/body
 )
 
 ;; Zoom
