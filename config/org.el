@@ -95,6 +95,6 @@
 (advice-add 'cfw:open-calendar-buffer :around #'my--cfw:open-calendar-buffer-view)
 
 ;; Automatic latex previews
-(use-package 'org-fragtog
-             :config
-             (add-hook 'org-mode-hook 'org-fragtog-mode))
+(use-package org-fragtog
+  :config
+  (add-hook 'org-mode-hook 'org-fragtog-mode))
