@@ -93,3 +93,8 @@
   (apply orig-func :view 'week :allow-other-keys t args)
   )
 (advice-add 'cfw:open-calendar-buffer :around #'my--cfw:open-calendar-buffer-view)
+
+;; Automatic latex previews
+(straight-use-package 'org-fragtog)
+(require 'org-fragtog)
+(add-hook 'org-mode-hook 'org-fragtog-mode)
