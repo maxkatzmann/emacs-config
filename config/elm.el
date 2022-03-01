@@ -1,4 +1,4 @@
-(straight-use-package 'elm-mode)
+(use-package elm-mode)
 
 ;; Format on save
 (add-hook 'elm-mode-hook (lambda ()

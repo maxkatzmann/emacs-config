@@ -1,15 +1,16 @@
 ;; org-roam
-(straight-use-package 'org-roam)
-(require 'org-roam)
-(setq org-roam-directory (file-truename "~/Documents/org-roam"))
-(org-roam-db-autosync-mode)
+(use-package org-roam
+  :config
+  (setq org-roam-directory (file-truename "~/Documents/org-roam"))
+  (org-roam-db-autosync-mode)
 
-;; Overwrite default capture template
-(setq org-roam-capture-templates
-      '(("d" "default" plain "%?"
-         :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" ":PROPERTIES:\n:ID: %(org-id-new)\n:LOGGING: nil\n:END:\n#+title: ${title}\n")
-         :unnarrowed t)
-        ))
+  ;; Overwrite default capture template
+  (setq org-roam-capture-templates
+        '(("d" "default" plain "%?"
+           :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" ":PROPERTIES:\n:ID: %(org-id-new)\n:LOGGING: nil\n:END:\n#+title: ${title}\n")
+           :unnarrowed t)
+          ))
+  )
 
 ;; org-agenda
 (defun org-agenda-refresh ()
@@ -23,25 +24,26 @@
         (sequence "LATER(l)" "NEXT(n)" "WAITING(w)" "ACTIVE(a)" "|" "COMPLETED(c)")))
 
 ;; evil org
-(straight-use-package 'evil-org)
-(require 'evil-org)
-(add-hook 'org-mode-hook 'evil-org-mode)
-(evil-org-set-key-theme '(navigation insert textobjects additional calendar))
-(require 'evil-org-agenda)
-(evil-org-agenda-set-keys)
+(use-package evil-org
+  :config
+  (add-hook 'org-mode-hook 'evil-org-mode)
+  (evil-org-set-key-theme '(navigation insert textobjects additional calendar))
+  (require 'evil-org-agenda)
+  (evil-org-agenda-set-keys))
 
 ;; Prevent TAB issues when using evil-org from terminal.
 (setq evil-want-C-i-jump nil)
 
 ;; org-bullets
-(straight-use-package 'org-bullets)
-(require 'org-bullets)
-(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-(setq org-bullets-bullet-list '("▶" "▷" "◉" "○"))
+(use-package org-bullets
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+  (setq org-bullets-bullet-list '("▶" "▷" "◉" "○")))
 
 ;; org-notifications
-(straight-use-package 'org-notifications)
-(org-notifications-start)
+(use-package org-notifications
+  :config
+  (org-notifications-start))
 
 ;; Functions for quick access to specific TODO lists.
 
@@ -73,10 +75,8 @@
 (setq org-cycle-separator-lines -2)
 
 ;; Calendar for agenda.
-(straight-use-package 'calfw)
-(require 'calfw)
-(straight-use-package 'calfw-org)
-(require 'calfw-org)
+(use-package calfw)
+(use-package calfw-org)
 
 ;; Unicode characters
 (setq cfw:fchar-junction ?╋

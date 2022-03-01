@@ -1,2 +1,3 @@
-(straight-use-package 'bazel)
-(setq bazel-buildifier-before-save t)
+(use-package bazel
+  :config
+  (setq bazel-buildifier-before-save t))

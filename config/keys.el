@@ -6,47 +6,55 @@
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 ;; evil
-(setq evil-want-keybinding nil) ;; Required for evil-collection
-(straight-use-package 'evil)
-(require 'evil)
-(evil-mode 1)
-;; Tell evil to use undo-tree
-(evil-set-undo-system 'undo-tree)
+(use-package evil
+  :init
+  (setq evil-want-keybinding nil) ;; Required for evil-collection
+  (setq evil-want-visual-char-semi-exclusive t)
+  :config
+  (evil-mode 1)
+  ;; Tell evil to use undo-tree
+  (evil-set-undo-system 'undo-tree))
 
 ;; Allow evil bindins throughout emacs, e.g., also in magit.
-(straight-use-package 'evil-collection)
-(evil-collection-init)
+(use-package evil-collection
+  :after evil
+  :config
+  (evil-collection-init))
 
 ;; evil surround
-(straight-use-package 'evil-surround)
-(global-evil-surround-mode 1)
-(evil-define-key 'visual global-map "s" 'evil-surround-region)
+(use-package evil-surround
+  :config
+  (global-evil-surround-mode 1)
+  (evil-define-key 'visual global-map "s" 'evil-surround-region))
 
 ;; evil exchange
-(straight-use-package 'evil-exchange)
-(require 'evil-exchange)
-(evil-exchange-install)
+(use-package evil-exchange
+  :config
+  (evil-exchange-install))
 
 ;; which key
-(straight-use-package 'which-key)
-(require 'which-key)
-(which-key-setup-minibuffer)
-(which-key-mode)
+(use-package which-key
+  :config
+  (which-key-setup-minibuffer)
+  (which-key-mode))
 
 ;; iedit
-(straight-use-package 'iedit)
-(require 'iedit)
-(straight-use-package 'evil-iedit-state)
-(require 'evil-iedit-state)
+(use-package iedit
+  :config
+  (straight-use-package 'evil-iedit-state)
+  (require 'evil-iedit-state))
 
 ;; Use swiper for search.
 (define-key evil-normal-state-map "/" 'swiper)
 
+;; Hydra for transient states.
+(use-package hydra)
+
 ;; spacemode
-(straight-use-package 'dash)
-(straight-use-package 'general)
-(straight-use-package 'bind-map)
-(straight-use-package 'bind-key)
+(use-package dash)
+(use-package general)
+(use-package bind-map)
+(use-package bind-key)
 (straight-use-package
  '(spaceleader :type git :host github :repo "mohkale/spaceleader"))
 
@@ -112,6 +120,15 @@
   (split-and-follow-horizontally)
   (switch-to-buffer "*terminal*"))
 
+;; Transient state for window resizing
+(defhydra transient-window-resize-vertically (:timeout 4)
+  "resize window vertically"
+  ("S" cycle-resize-window-vertically "resize vertically"))
+
+(defhydra transient-window-resize-horizontally (:timeout 4)
+  "resize window vertically"
+  ("V" cycle-resize-window-horizontally "resize horizontally"))
+
 (leader-set-keys
   "w" '(:ignore t :wk "window")
   "wd" 'delete-window
@@ -126,8 +143,8 @@
   "wk" 'evil-window-up
   "wK" 'evil-window-move-very-top
   "wt" 'split-to-term
-  "wS" 'cycle-resize-window-vertically
-  "wV" 'cycle-resize-window-horizontally
+  "wS" 'transient-window-resize-vertically/body
+  "wV" 'transient-window-resize-horizontally/body
 )
 
 ;; Zoom
