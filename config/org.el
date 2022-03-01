@@ -17,6 +17,8 @@
   (interactive)
   (setq org-agenda-files (directory-files-recursively "~/Documents/org-roam/" "\\.org$")))
 (org-agenda-refresh)
+;; Warn 14 days before a deadline.
+(setq org-deadline-warning-days 14)
 
 ;; TODO keywords
 (setq org-todo-keywords

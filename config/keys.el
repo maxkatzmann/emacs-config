@@ -311,3 +311,8 @@
 
 ;; Bazel
 (leader-set-keys-for-major-mode 'bazel-mode "=" 'bazel-buildifier)
+
+;; C++
+(leader-set-keys-for-major-mode 'c++-mode "gd" 'lsp-find-definition)
+
+
