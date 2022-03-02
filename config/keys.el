@@ -157,10 +157,7 @@
 (leader-set-keys
   "g" '(:ignore t :wk "git")
   "gs" 'magit-status
-  "gh" 'diff-hl-show-hunk
-  "gn" 'diff-hl-next-hunk
-  "gr" 'diff-hl-revert-hunk
-  "gc" 'diff-hl-show-hunk-copy-original-text
+  "gh" 'magit-diff-buffer-file
   "gm" '(:ignore t :wk "merge")
   "gmn" 'smerge-next
   "gmp" 'smerge-prev
@@ -169,11 +166,10 @@
   "gmo" 'smerge-keep-other
 )
 
-;; Jumping
-(leader-set-keys
-  "j" '(:ignore t :wk "jump")
-  "ji" 'lsp-ivy-workspace-symbol
-)
+;; Jumping depending on the mode
+(add-hook 'lsp-mode-hook (lambda ()
+                           (leader-set-keys
+                             "mj" 'lsp-ivy-workspace-symbol)))
 
 ;; Help
 (leader-set-keys
@@ -279,6 +275,7 @@
 (leader-set-keys-for-major-mode 'org-mode "in" 'org-roam-node-insert)
 (leader-set-keys-for-major-mode 'org-mode "il" 'org-insert-link)
 (leader-set-keys-for-major-mode 'org-mode "o" 'org-open-at-point)
+(leader-set-keys-for-major-mode 'org-mode "j" 'counsel-imenu)
 
 ;; TeX
 (leader-set-keys-for-major-mode 'latex-mode "c" 'latex/build)

@@ -13,6 +13,7 @@
 (use-package git-gutter
   :config
   (add-hook 'prog-mode-hook (lambda () (git-gutter-mode)))
+  (add-hook 'TeX-mode-hook (lambda () (git-gutter-mode)))
   (setq git-gutter:update-interval 0.02))
 
 (use-package git-gutter-fringe
@@ -23,4 +24,3 @@
   (set-face-foreground 'git-gutter-fr:modified "dodger blue")
   (set-face-foreground 'git-gutter-fr:added    "sea green")
   (set-face-foreground 'git-gutter-fr:deleted  "red2"))
-
