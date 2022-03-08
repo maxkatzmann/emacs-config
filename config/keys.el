@@ -92,7 +92,7 @@
 (defun find-user-init-file ()
   "Edit the `user-init-file', in another window."
   (interactive)
-  (find-file-other-window user-init-file))
+  (find-file user-init-file))
 
 (leader-set-keys
   "f" '(:ignore t :wk "files")

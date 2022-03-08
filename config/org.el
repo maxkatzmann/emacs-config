@@ -1,3 +1,13 @@
+;; org
+(defun mk/org-mode-setup ()
+  (org-indent-mode))
+
+(use-package org
+  :hook (org-mode . mk/org-mode-setup)
+  :config
+  (setq org-ellipsis " ▾"))
+
+
 ;; org-roam
 (use-package org-roam
   :config
