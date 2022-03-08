@@ -246,6 +246,7 @@
   "oaN" 'org-todo-list-NEXT
   "oaL" 'org-todo-list-LATER
   "oaW" 'org-todo-list-WAITING
+  "oaB" 'org-agenda-BOARD
   "oal" 'org-agenda-list
   "oac" 'cfw:open-org-calendar
   "oar" 'org-agenda-refresh
