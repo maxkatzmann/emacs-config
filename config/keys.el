@@ -92,7 +92,7 @@
 (defun find-user-init-file ()
   "Edit the `user-init-file', in another window."
   (interactive)
-  (find-file-other-window user-init-file))
+  (find-file user-init-file))
 
 (leader-set-keys
   "f" '(:ignore t :wk "files")
@@ -245,6 +245,7 @@
   "oaN" 'org-todo-list-NEXT
   "oaL" 'org-todo-list-LATER
   "oaW" 'org-todo-list-WAITING
+  "oaB" 'org-agenda-BOARD
   "oal" 'org-agenda-list
   "oac" 'cfw:open-org-calendar
   "oar" 'org-agenda-refresh

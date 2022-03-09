@@ -1,3 +1,13 @@
+;; org
+(defun mk/org-mode-setup ()
+  (org-indent-mode))
+
+(use-package org
+  :hook (org-mode . mk/org-mode-setup)
+  :config
+  (setq org-ellipsis " ▾"))
+
+
 ;; org-roam
 (use-package org-roam
   :config
@@ -7,7 +17,7 @@
   ;; Overwrite default capture template
   (setq org-roam-capture-templates
         '(("d" "default" plain "%?"
-           :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" ":PROPERTIES:\n:ID: %(org-id-new)\n:LOGGING: nil\n:END:\n#+title: ${title}\n")
+           :target (file+head "${slug}.org" ":PROPERTIES:\n:ID: %(org-id-new)\n:LOGGING: nil\n:END:\n#+title: ${title}\n")
            :unnarrowed t)
           ))
   )
@@ -24,6 +34,24 @@
 (setq org-todo-keywords
       '((sequence "TODO(t)" "|" "DONE(d!)")
         (sequence "LATER(l)" "NEXT(n)" "WAITING(w)" "ACTIVE(a)" "|" "COMPLETED(c)")))
+
+;; Configure custom agenda views
+  (setq org-agenda-custom-commands
+   '(("w" "Workflow Status"
+      ((todo "NEXT"
+            ((org-agenda-overriding-header "Things to do next")
+             (org-agenda-todo-list-sublevels nil)
+             (org-agenda-files org-agenda-files)))
+       (todo "TODO"
+            ((org-agenda-overriding-header "Not pressing")
+             (org-agenda-files org-agenda-files)))
+       (todo "WAITING"
+            ((org-agenda-overriding-header "Waiting for External")
+             (org-agenda-files org-agenda-files)))
+       (todo "LATER"
+            ((org-agenda-overriding-header "Backlog")
+             (org-agenda-files org-agenda-files))) 
+      ))))
 
 ;; evil org
 (use-package evil-org
@@ -64,6 +92,11 @@
 (defun org-todo-list-WAITING ()
   (interactive)
   (org-todo-list "WAITING"))
+
+(defun org-agenda-BOARD ()
+  (interactive)
+  (org-agenda nil "w"))
+
 
 
 ;; Add custom heights to org-mode section titles
