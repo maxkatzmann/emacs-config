@@ -274,6 +274,7 @@
 (leader-set-keys-for-major-mode 'org-mode "it" 'org-insert-todo-heading)
 (leader-set-keys-for-major-mode 'org-mode "in" 'org-roam-node-insert)
 (leader-set-keys-for-major-mode 'org-mode "il" 'org-insert-link)
+(leader-set-keys-for-major-mode 'org-mode "ic" 'mk/org-insert-src-block)
 (leader-set-keys-for-major-mode 'org-mode "o" 'org-open-at-point)
 (leader-set-keys-for-major-mode 'org-mode "j" 'counsel-imenu)
 

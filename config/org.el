@@ -137,3 +137,8 @@
 (use-package org-fragtog
   :config
   (add-hook 'org-mode-hook 'org-fragtog-mode))
+
+;; Function to quickly insert a source block
+(defun mk/org-insert-src-block ()
+   (interactive)
+   (insert "#+begin_src\n\n#+end_src"))
