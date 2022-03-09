@@ -118,16 +118,16 @@
 (defun split-to-term ()
   (interactive)
   (split-and-follow-horizontally)
+  (evil-window-move-very-bottom)
+  (unless (get-buffer "*terminal*")
+    (term "/bin/zsh"))
   (switch-to-buffer "*terminal*"))
 
 ;; Transient state for window resizing
-(defhydra transient-window-resize-vertically (:timeout 4)
+(defhydra hydra-transient-window-resize (:timeout 4)
   "resize window vertically"
-  ("S" cycle-resize-window-vertically "resize vertically"))
-
-(defhydra transient-window-resize-horizontally (:timeout 4)
-  "resize window vertically"
-  ("V" cycle-resize-window-horizontally "resize horizontally"))
+  ("s" cycle-resize-window-vertically "resize vertically")
+  ("v" cycle-resize-window-horizontally "resize horizontally"))
 
 (leader-set-keys
   "w" '(:ignore t :wk "window")
@@ -143,8 +143,7 @@
   "wk" 'evil-window-up
   "wK" 'evil-window-move-very-top
   "wt" 'split-to-term
-  "wS" 'transient-window-resize-vertically/body
-  "wV" 'transient-window-resize-horizontally/body
+  "wR" 'hydra-transient-window-resize/body
 )
 
 ;; Zoom
@@ -311,5 +310,4 @@
 
 ;; C++
 (leader-set-keys-for-major-mode 'c++-mode "gd" 'lsp-find-definition)
-
-
+(leader-set-keys-for-major-mode 'c++-mode "=" 'lsp-format-buffer)
