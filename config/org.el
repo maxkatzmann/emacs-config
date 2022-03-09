@@ -137,6 +137,8 @@
 (use-package org-fragtog
   :config
   (add-hook 'org-mode-hook 'org-fragtog-mode))
+;; Increase the font-size of latex previews.
+(setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
 
 ;; Function to quickly insert a source block
 (defun mk/org-insert-src-block ()
