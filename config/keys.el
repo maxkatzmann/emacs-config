@@ -70,6 +70,13 @@
   "u" 'universal-argument
 )
 
+;; Applications
+(leader-set-keys
+  "a" '(:ignore t :wk "applications")
+  "ad" 'dired
+)
+
+
 ;; Buffers
 (defun create-scratch-buffer nil
    "create a scratch buffer"

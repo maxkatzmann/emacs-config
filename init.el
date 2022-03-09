@@ -33,6 +33,7 @@
 (load-library "latex")
 (load-library "general")
 (load-library "org")
+(load-library "protobuf")
 (load-library "r")
 (load-library "theme")
 (load-library "ui")
