@@ -1,3 +1,11 @@
+#+title: Emax Configuration
+#+PROPERTY: header-args:emacs-lisp :tangle ./init.el
+
+* Package Management
+
+** Straight
+
+#+begin_src emacs-lisp
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -11,46 +19,130 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+#+end_src
+
+** use-package
+
+#+begin_src emacs-lisp
 (straight-use-package 'use-package)
 (use-package straight
              :custom (straight-use-package-by-default t))
 
+#+end_src
+
+We need this to fix an issue with `org-file-name-concat` having a void function definition.
+
+#+begin_src emacs-lisp
 (straight-use-package 'org)
 (package-initialize)
 
+#+end_src
+
+* General
+
+We do not want the contents of the clipboard to be overwritten when
+pasting something in visual mode.
+
+#+begin_src emacs-lisp
 (setq-default evil-kill-on-visual-paste nil)
 
+#+end_src
+
+Unfilling allows us to collapse a paragraph into a line.
+
+#+begin_src emacs-lisp
 (use-package unfill)
 
+#+end_src
+
+Make use of the undo tree
+
+#+begin_src emacs-lisp
 (use-package undo-tree
   :config
   (global-undo-tree-mode))
 
+#+end_src
+
+Easily convert text to title case
+
+#+begin_src emacs-lisp
 (use-package titlecase)
 
+#+end_src
+
+To make sure that the locale is set correctly (required by magit), we
+use `exec path from shell`.
+
+#+begin_src emacs-lisp
 (use-package exec-path-from-shell
   :config
   (exec-path-from-shell-copy-envs '("LANG" "LC_ALL" "LC_CTYPES")))
 
+#+end_src
+
+** Writeroom
+
+This mode is nice if we want to focus on a single buffer and have in
+the center.
+
+#+begin_src emacs-lisp
 (use-package writeroom-mode)
 
+#+end_src
+
+** Help
+
+#+begin_src emacs-lisp
 (use-package helpful)
 
+#+end_src
+
+** Window Resizing
+
+#+begin_src emacs-lisp
 (use-package cycle-resize
   :config
   (setq cycle-resize-steps '(75 50 25 50)))
 
+#+end_src
+
+* Theme
+
+** Nano
+
+#+begin_src emacs-lisp
 (straight-use-package
   '(nano-emacs :type git :host github :repo "rougier/nano-emacs"))
 (require 'nano)
 (require 'nano-theme-light)
 (require 'nano-theme-dark)
 
+#+end_src
+
+** Fonts
+
+Set the default font for everything
+
+#+begin_src emacs-lisp
 (setq nano-font-family-monospaced "Roboto Mono")
 
+#+end_src
+
+Nano disables font-look by default, which we re-enable because its so
+nice.
+
+#+begin_src emacs-lisp
 (setq font-lock-maximum-decoration t)
 (setq font-lock-maximum-size 256000)
 
+#+end_src
+
+** Fringe
+
+Nano disables the fringe.  We want it back.
+
+#+begin_src emacs-lisp
 (setq default-frame-alist
       (append (list
 	           '(min-height . 1)
@@ -64,6 +156,11 @@
                '(tool-bar-lines . 0)
                '(menu-bar-lines . 0))))
 
+#+end_src
+
+** Dark/Light Switching
+
+#+begin_src emacs-lisp
 (defun nano-refresh-theme ()
    "Convenience function which refreshes the nano-theme.
  Calls \(nano-faces\) and \(nano-theme\) sequentially."
@@ -103,26 +200,66 @@
 (nano-theme-set-light)
 (nano-refresh-theme)
 
+#+end_src
+
+* UI
+
+** General
+
+#+begin_src emacs-lisp
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 
+#+end_src
+
+** Lines
+
+*** Numbers
+
+#+begin_src emacs-lisp
 (global-display-line-numbers-mode t)
 (setq display-line-numbers-type 'relative)
 (add-hook 'term-mode-hook (lambda () (display-line-numbers-mode 0)))
 
+#+end_src
+
+*** Spacing
+
+#+begin_src emacs-lisp
 (setq-default line-spacing 2)
 (setq default-text-properties '(line-spacing 0.2 line-height 1.2))
 
+#+end_src
+
+*** Highlight
+
+#+begin_src emacs-lisp
 (global-hl-line-mode 1)
 
+#+end_src
+
+** Delimiters
+
+#+begin_src emacs-lisp
 (use-package rainbow-delimiters
   :config
   (add-hook 'prog-mode-hook (lambda () (rainbow-delimiters-mode))))
 
+#+end_src
+
+** SVG Tags
+
+*** Regex for Org-mode tags
+
+#+begin_src emacs-lisp
 (defconst date-re "[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}")
 (defconst time-re "[0-9]\\{2\\}:[0-9]\\{2\\}")
 (defconst day-re "[A-Za-z]\\{2,3\\}")
+#+end_src
 
+*** Progress Visualization
+
+#+begin_src emacs-lisp
 (defun svg-progress-percent (value)
   (svg-image (svg-lib-concat
               (svg-lib-progress-bar (/ (string-to-number value) 100.0)
@@ -140,8 +277,93 @@
               (svg-lib-tag value nil
                            :stroke 0 :margin 0)) :ascent 'center)))
 
+#+end_src
+
+*** Setup
+
+By specifying `:tangle no` on this block, we disable it.
+
+#+begin_src emacs-lisp :tangle no
+(use-package svg-tag-mode
+   :ensure t
+   :init
+   (setq svg-tag-tags
+        `(
+          ;; Org tags
+          ;; (":\\([A-Za-z0-9]+\\)" . ((lambda (tag) (svg-tag-make tag))))
+          ;; (":\\([A-Za-z0-9]+[ \-]\\)" . ((lambda (tag) tag)))
+
+          ;; Task priority
+          ("\\[#[A-Z]\\]" . ( (lambda (tag)
+                                (svg-tag-make tag :face 'org-priority 
+                                              :beg 2 :end -1 :margin 0))))
+
+          ;; Progress
+          ("\\(\\[[0-9]\\{1,3\\}%\\]\\)" . ((lambda (tag)
+                                              (svg-progress-percent (substring tag 1 -2)))))
+          ("\\(\\[[0-9]+/[0-9]+\\]\\)" . ((lambda (tag)
+                                            (svg-progress-count (substring tag 1 -1)))))
+
+          ;; TODO / DONE
+          ("TODO" . ((lambda (tag) (svg-tag-make "TODO" :face 'org-todo :inverse t :font-size 14.0 :margin 0))))
+          ("LATER" . ((lambda (tag) (svg-tag-make "LATER" :face 'org-todo :inverse t :font-size 14.0 :margin 0))))
+          ("WAITING" . ((lambda (tag) (svg-tag-make "WAITING" :face 'org-todo :inverse t :font-size 14.0 :margin 0))))
+          ("NEXT" . ((lambda (tag) (svg-tag-make "NEXT" :face 'org-todo :inverse t :font-size 14.0 :margin 0))))
+          ("DONE" . ((lambda (tag) (svg-tag-make "DONE" :face 'org-done :font-size 14.0 :margin 0))))
+          ("\\todo" . ((lambda (tag) (svg-tag-make "TODO" :radius 3 :inverse t :font-size 14.0))))
+
+
+          ;; Citation of the form [cite:@Knuth:1984] 
+          ("\\(\\[cite:@[A-Za-z]+:\\)" . ((lambda (tag)
+                                            (svg-tag-make tag
+                                                          :inverse t
+                                                          :beg 7 :end -1
+                                                          :crop-right t))))
+          ("\\[cite:@[A-Za-z]+:\\([0-9]+\\]\\)" . ((lambda (tag)
+                                                  (svg-tag-make tag
+                                                                :end -1
+                                                                :crop-left t))))
+
+
+          ;; Active date (variants with/without day name, with/without time)
+          (,(format "\\(<%s>\\)" date-re) .
+           ((lambda (tag)
+              (svg-tag-make tag :beg 1 :end -1 :font-size 14.0 :margin 0))))
+          (,(format "\\(<%s %s>\\)" date-re day-re) .
+           ((lambda (tag)
+              (svg-tag-make tag :beg 1 :end -1 :inverse nil :font-size 14.0 :margin 0))))
+          (,(format "\\(<%s %s *\\)%s>" date-re day-re time-re) .
+           ((lambda (tag)
+              (svg-tag-make tag :beg 1 :inverse nil :crop-right t :font-size 14.0 :margin 0))))
+          (,(format "<%s %s *\\(%s>\\)" date-re day-re time-re) .
+           ((lambda (tag)
+              (svg-tag-make tag :end -1 :inverse t :crop-left t :font-size 14.0 :margin 0))))
+
+          ;; Inactive date  (without day name, with or without time)
+           (,(format "\\(\\[%s\\]\\)" date-re) .
+            ((lambda (tag)
+               (svg-tag-make tag :beg 1 :end -1 :font-size 14.0 :margin 0 :face 'org-date))))
+           (,(format "\\(\\[%s %s *\\)%s\\]" date-re day-re time-re) .
+            ((lambda (tag)
+               (svg-tag-make tag :beg 1 :inverse nil :crop-right t :font-size 14.0 :margin 0 :face 'org-date))))
+           (,(format "\\[%s %s *\\(%s\\]\\)" date-re day-re time-re) .
+            ((lambda (tag)
+               (svg-tag-make tag :end -1 :inverse t :crop-left t :font-size 14.0 :margin 0 :face 'org-date)))))) 
+  :hook ((prog-mode textmode) . (svg-tag-mode t)))
+#+end_src
+
+* Completion
+
+** Counsel
+
+#+begin_src emacs-lisp
 (use-package counsel)
 
+#+end_src
+
+** ivy
+
+#+begin_src emacs-lisp
 (use-package ivy
   :config
   (ivy-mode)
@@ -152,27 +374,69 @@
   :config
   (ivy-rich-mode 1))
 
+#+end_src
+
+** amx
+
+#+begin_src emacs-lisp
 (use-package amx
   :config
   (amx-mode))
 
+#+end_src
+
+** Company
+
+#+begin_src emacs-lisp
 (use-package company)
 
+#+end_src
+
+** Parentheses
+
+#+begin_src emacs-lisp
 (use-package smartparens
   :config
   (smartparens-global-mode t))
 
+#+end_src
+
+** Spelling
+
+#+begin_src emacs-lisp
 (dolist (hook '(text-mode-hook))
       (add-hook hook (lambda () (flyspell-mode 1))))
 
+#+end_src
+
+The default language should be english.
+
+#+begin_src emacs-lisp
 (setq-default ispell-dictionary "english")
 
+#+end_src
+
+* Git
+
+** Magit
+
+#+begin_src emacs-lisp
 (use-package magit)
 (use-package magit-delta)
 (use-package magit-todos)
 
+#+end_src
+
+Enable `delta` mode automatically.
+
+#+begin_src emacs-lisp
 (add-hook 'magit-mode-hook (lambda () (magit-delta-mode +1)))
 
+#+end_src
+
+** Gutter
+
+#+begin_src emacs-lisp
 (use-package git-gutter
   :config
   (add-hook 'prog-mode-hook (lambda () (git-gutter-mode)))
@@ -188,19 +452,45 @@
   (set-face-foreground 'git-gutter-fr:added    "sea green")
   (set-face-foreground 'git-gutter-fr:deleted  "red2"))
 
+#+end_src
+
+* Files and Projects
+
+** Projectile
+
+#+begin_src emacs-lisp
 (use-package projectile
   :config
   (projectile-mode +1))
 
+#+end_src
+
+** Dired
+
+Improve how dired buffers are displayed.
+
+#+begin_src emacs-lisp
 (when (string= system-type "darwin")
   (setq dired-use-ls-dired t
         insert-directory-program "/usr/local/bin/gls"
         dired-listing-switches "-aBhl --group-directories-first"))
 
+#+end_src
+
+* Programming
+
+** Bazel
+
+#+begin_src emacs-lisp
 (use-package bazel
   :config
   (setq bazel-buildifier-before-save t))
 
+#+end_src
+
+** C++
+
+#+begin_src emacs-lisp
 (use-package cc-mode)
 (use-package clang-format)
 (use-package cpp-auto-include)
@@ -210,36 +500,93 @@
                            (require 'clang-format)
                            (require 'cpp-auto-include)))
 
+#+end_src
+
+** elm
+
+#+begin_src emacs-lisp
 (use-package elm-mode)
 
+#+end_src
+
+Enable formatting on save
+
+#+begin_src emacs-lisp
 (add-hook 'elm-mode-hook (lambda ()
                            (lsp-ui-doc-mode -1)
                            (elm-format-on-save-mode 1)))
+#+end_src
 
+** LaTeX
+
+Somehow setting up auctex with use-package did not work, so we do it
+via straight instead.
+
+#+begin_src emacs-lisp
 (straight-use-package 'auctex)
 (use-package ivy-bibtex)
 
+#+end_src
+
+Setting up the TeX distribution
+
+#+begin_src emacs-lisp
 (setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin/"))
 (setq exec-path (append exec-path '("/Library/TeX/texbin/")))
 
+#+end_src
+
+Open the error overview after building.
+
+#+begin_src emacs-lisp
 (setq TeX-error-overview-open-after-TeX-run t)
 
+#+end_src
+
+Setup Synctex
+
+#+begin_src emacs-lisp
 (setq TeX-source-correlate-mode t)
 (setq TeX-source-correlate-start-server t)
 (setq TeX-source-correlate-method 'synctex)
 
+#+end_src
+
+PDF Output
+
+#+begin_src emacs-lisp
 (setq TeX-view-program-list
       '(("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")))
 (setq TeX-view-program-selection '((output-pdf "Skim")))
 
+#+end_src
+
+We want a smaller fill-column than usual in latex mode.
+
+#+begin_src emacs-lisp
 (add-hook 'TeX-mode-hook (lambda ()
                            (lsp-ui-doc-mode -1)
                            (setq fill-column 70)))
 
+#+end_src
+
+Sentences should end with double spaces.
+
+#+begin_src emacs-lisp
 (setq sentence-end-double-space t)
 
+#+end_src
+
+*** Bibtex
+
+#+begin_src emacs-lisp
 (use-package org-ref)
 
+#+end_src
+
+We use a custom function for Bibtex key generation.
+
+#+begin_src emacs-lisp
 (require 'cl-lib)
 (setq bibtex-autokey-before-presentation-function
   (lambda
@@ -272,18 +619,43 @@
 (setq bibtex-autokey-titleword-separator "")
 (setq bibtex-autokey-year-title-separator "-")
 
+#+end_src
+
+Enable line numbers in Bibtex mode by default.
+
+#+begin_src emacs-lisp
 (add-hook 'bibtex-mode-hook (lambda ()
                               (display-line-numbers-mode)
                               (setq display-line-numbers 'relative)))
 
+#+end_src
+
+Enable Reftex in AUCTeX
+
+#+begin_src emacs-lisp
 (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
 
+#+end_src
+
+Enable a nice interface between RefTeX and AUCTeX
+
+#+begin_src emacs-lisp
 (setq reftex-plug-into-AUCTeX t)
 
+#+end_src
+
+Tell RefTeX where it should look for bib files.
+
+#+begin_src emacs-lisp
 (setq reftex-external-file-finders
       '(("tex" . "kpsewhich -format=.tex %f")
         ("bib" . "kpsewhich -format=.bib %f")))
 
+#+end_src
+
+Automatically include a tilde `~` before a citation.
+
+#+begin_src emacs-lisp
 (setq reftex-format-cite-function 
   '(lambda (key fmt)
      (let ((cite (replace-regexp-in-string "%l" key fmt)))
@@ -294,6 +666,11 @@
            cite
          (concat "~" cite)))))
 
+#+end_src
+
+*** LatexMk
+
+#+begin_src emacs-lisp
 (use-package auctex-latexmk
   :config
   (setq auctex-latexmk-inherit-TeX-PDF-mode t)
@@ -301,6 +678,11 @@
   (setq TeX-command-default "LatexMk")
   (setq latex-build-command "LatexMk"))
 
+#+end_src
+
+A nice build command that uses LatexMk
+
+#+begin_src emacs-lisp
 (defun latex/build ()
   (interactive)
   (progn
@@ -308,6 +690,11 @@
       (TeX-save-document (TeX-master-file)))
     (TeX-command latex-build-command 'TeX-master-file -1)))
 
+#+end_src
+
+Functions to change latex font environments (bold, emphasis, etc.)
+
+#+begin_src emacs-lisp
 (defun latex/font-bold () (interactive) (TeX-font nil ?\C-b))
 (defun latex/font-medium () (interactive) (TeX-font nil ?\C-m))
 (defun latex/font-code () (interactive) (TeX-font nil ?\C-t))
@@ -322,8 +709,18 @@
 (defun latex/font-oblique () (interactive) (TeX-font nil ?\C-s))
 (defun latex/font-upright () (interactive) (TeX-font nil ?\C-u))
 
+#+end_src
+
+** Protobuf
+
+#+begin_src emacs-lisp
 (use-package protobuf-mode)
 
+#+end_src
+
+** Python
+
+#+begin_src emacs-lisp
 (use-package python-mode)
 
 (use-package company-jedi)
@@ -341,14 +738,32 @@
 
 (setq lsp-enable-file-watchers nil)
 
+#+end_src
+
+** R
+
+#+begin_src emacs-lisp
 (use-package ess)
 (use-package ess-view-data)
 
+#+end_src
+
+Set LSP backend and disable ui-doc-mode since that interferes with our
+window manager.
+
+#+begin_src emacs-lisp
 (setq ess-r-backend 'lsp)
 
 (add-hook 'ess-r-mode-hook (lambda ()
                              (lsp-ui-doc-mode -1)))
 
+#+end_src
+
+* Org
+
+Enable org-indent-mode for nicer indentation
+
+#+begin_src emacs-lisp
 (defun mk/org-mode-setup ()
   (org-indent-mode))
 
@@ -357,20 +772,41 @@
   :config
   (setq org-ellipsis " ▾"))
 
+#+end_src
+
+Custom heights for org-mode section titles.
+
+#+begin_src emacs-lisp
 (defun font-height-org-mode-hook ()
   "Stop the org-level headers from increasing in height relative to the other text."
   (set-face-attribute 'org-level-1 nil :height 1.5)
   (set-face-attribute 'org-level-2 nil :height 1.2))
 (add-hook 'org-mode-hook #'font-height-org-mode-hook)
 
+#+end_src
+
+Disable folding of double empty lines.
+
+#+begin_src emacs-lisp
 (setq org-cycle-separator-lines -2)
 
+#+end_src
+
+Use tempo to automatically extend shortcuts into src blocks. (e.g.,
+type "<el" and hit TAB)
+
+#+begin_src emacs-lisp
 (require 'org-tempo)
 (add-to-list 'org-structure-template-alist '("bib" . "src bibtex"))
 (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 (add-to-list 'org-structure-template-alist '("py" . "src python"))
 (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
 
+#+end_src
+
+Functions for quick access to specific TODO lists.
+
+#+begin_src emacs-lisp
 (defun org-todo-list-LATER ()
   (interactive)
   (org-todo-list "LATER"))
@@ -391,6 +827,16 @@
   (interactive)
   (org-agenda nil "w"))
 
+#+end_src
+
+** Roam
+
+We tell org-roam to store all documents in `~/Documents/org-roam` and
+overwrite the default template such that logging is disabled and latex
+previews are rendered by default. (`Logging` here refers to the
+logging of state changes, e.g., when a TODO is changed to DONE.)
+
+#+begin_src emacs-lisp
 (use-package org-roam
   :config
   (setq org-roam-directory (file-truename "~/Documents/org-roam"))
@@ -404,20 +850,48 @@
           ))
   )
 
+#+end_src
+
+** Agenda
+
+A function that allows us to tell org-agenda to rescan the files in
+our org-roam directory.
+
+#+begin_src emacs-lisp
 (defun org-agenda-refresh ()
   (interactive)
   (setq org-agenda-files (directory-files-recursively "~/Documents/org-roam/" "\\.org$")))
 (org-agenda-refresh)
 
+#+end_src
+
+Warn 14 days before a deadline.
+
+#+begin_src emacs-lisp
 (setq org-deadline-warning-days 14)
 
+#+end_src
+
+The TODO keywords we want to work with
+
+#+begin_src emacs-lisp
 (setq org-todo-keywords
       '((sequence "TODO(t)" "|" "DONE(d!)")
         (sequence "LATER(l)" "NEXT(n)" "WAITING(w)" "ACTIVE(a)" "|" "COMPLETED(c)")))
 
+#+end_src
+
+Start week on mondays
+
+#+begin_src emacs-lisp
 (setq org-agenda-start-on-weekday 1)
 (setq calendar-week-start-day 1)
 
+#+end_src
+
+A custom agenda view that presents a nice sorted dashboard
+
+#+begin_src emacs-lisp
 (setq org-agenda-custom-commands
  '(("w" "Workflow Status"
     ((todo "NEXT"
@@ -435,6 +909,13 @@
            (org-agenda-files org-agenda-files))) 
     ))))
 
+#+end_src
+
+** Evil-org
+
+Use evil in org-mode
+
+#+begin_src emacs-lisp
 (use-package evil-org
   :config
   (add-hook 'org-mode-hook 'evil-org-mode)
@@ -442,13 +923,31 @@
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys))
 
+#+end_src
+
+Prevent TAB issues when using evil-org from terminal.
+
+#+begin_src emacs-lisp
 (setq evil-want-C-i-jump nil)
 
+#+end_src
+
+** Babel
+
+Allows us to execute code in src blocks within org documents.  We
+specify for which languages we want to have this enabled.
+
+#+begin_src emacs-lisp
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((emacs-lisp . t)
    (python . t)))
 
+#+end_src
+
+We want the `config.org` file to be tangled by babel automatically.
+
+#+begin_src emacs-lisp
 (defun mk/org-babel-tangle-config ()
   (when (string-equal (buffer-file-name)
                       (expand-file-name "~/.emacs.d/config.org"))
@@ -456,14 +955,31 @@
       (org-babel-tangle))))
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'mk/org-babel-tangle-config)))
 
+#+end_src
+
+** Org-Bullets
+
+A nicer way to display the bullets in org-mode.
+
+#+begin_src emacs-lisp
 (use-package org-bullets
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
   (setq org-bullets-bullet-list '("▶" "▷" "◉" "○")))
 
+#+end_src
+
+** Calendar
+
+#+begin_src emacs-lisp
 (use-package calfw)
 (use-package calfw-org)
 
+#+end_src
+
+Use nicer unicode characters to display the calendar outlines.
+
+#+begin_src emacs-lisp
 (setq cfw:fchar-junction ?╋
       cfw:fchar-vertical-line ?┃
       cfw:fchar-horizontal-line ?━
@@ -473,26 +989,70 @@
       cfw:fchar-top-left-corner ?┏
       cfw:fchar-top-right-corner ?┓)
 
+#+end_src
+
+Open week view by default.
+
+#+begin_src emacs-lisp
 (defun my--cfw:open-calendar-buffer-view (orig-func &rest args &allow-other-keys)
   (apply orig-func :view 'week :allow-other-keys t args)
   )
 (advice-add 'cfw:open-calendar-buffer :around #'my--cfw:open-calendar-buffer-view)
 
+#+end_src
+
+** Latex Previews
+
+The `org-fragtog` package allows us to render latex previews right
+after we typed the code.
+
+#+begin_src emacs-lisp
 (use-package org-fragtog
   :config
   (add-hook 'org-mode-hook 'org-fragtog-mode))
 
+#+end_src
+
+Increase the font-size of latex previews.
+
+#+begin_src emacs-lisp
 (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
 
+#+end_src
+
+** Notifications
+
+TODO: This is not working yet.
+
+#+begin_src emacs-lisp
 (use-package org-notifications
   :config
   (org-notifications-start))
 
+#+end_src
+
+* Keybindings
+
+** General
+
+We want to use Alt/Option-Backspace to delete words.
+
+#+begin_src emacs-lisp
 (setq mac-option-modifier 'alt)
 (global-set-key (kbd "A-<backspace>") 'backward-kill-word)
 
+#+end_src
+
+Make ESC quit prompts
+
+#+begin_src emacs-lisp
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
+#+end_src
+
+** Evil
+
+#+begin_src emacs-lisp
 (use-package evil
   :init
   (setq evil-want-keybinding nil) ;; Required for evil-collection
@@ -502,34 +1062,85 @@
   ;; Tell evil to use undo-tree
   (evil-set-undo-system 'undo-tree))
 
+#+end_src
+
+To allow evil bindings throughout emacs, e.g., also in magit, we use
+evil-collection.
+
+#+begin_src emacs-lisp
 (use-package evil-collection
   :after evil
   :config
   (evil-collection-init))
 
+#+end_src
+
+Evil-surround allows us to surround a selection with characters.
+
+#+begin_src emacs-lisp
 (use-package evil-surround
   :config
   (global-evil-surround-mode 1)
   (evil-define-key 'visual global-map "s" 'evil-surround-region))
 
+#+end_src
+
+Evil-exchange can be used to swap selections.
+
+#+begin_src emacs-lisp
 (use-package evil-exchange
   :config
   (evil-exchange-install))
 
+#+end_src
+
+** Which Key
+
+Shows a an overview of the currently available keybindings.
+
+#+begin_src emacs-lisp
 (use-package which-key
   :config
   (which-key-setup-minibuffer)
   (which-key-mode))
 
+#+end_src
+
+** iedit
+
+Lets us edit in multiple places in a buffer at once.
+
+#+begin_src emacs-lisp
 (use-package iedit
   :config
   (straight-use-package 'evil-iedit-state)
   (require 'evil-iedit-state))
 
+#+end_src
+
+** Search
+
+We want to use swiper for search
+
+#+begin_src emacs-lisp
 (define-key evil-normal-state-map "/" 'swiper)
 
+#+end_src
+
+** Hydra
+
+Allows us to define our own transient states.
+
+#+begin_src emacs-lisp
 (use-package hydra)
 
+#+end_src
+
+** Space Mode
+
+Allows us to use SPC for all kinds of actions, just like spacemacs.
+
+#+begin_src emacs-lisp
 (use-package dash)
 (use-package general)
 (use-package bind-map)
@@ -537,6 +1148,11 @@
 (straight-use-package
  '(spaceleader :type git :host github :repo "mohkale/spaceleader"))
 
+#+end_src
+
+** Bindings
+
+#+begin_src emacs-lisp
 (leader-set-keys
   "TAB" '(switch-to-last-buffer+ :wk "last-buffer")
   "SPC" '(counsel-M-x :wk "M-x")
@@ -544,16 +1160,36 @@
   "DEL"      'exit-recursive-edit
 )
 
+#+end_src
+
+*** Applications
+
+#+begin_src emacs-lisp
 (leader-set-keys
   "a" '(:ignore t :wk "applications")
   "ad" 'dired
 )
 
+#+end_src
+
+*** Bazel
+
+#+begin_src emacs-lisp
 (leader-set-keys-for-major-mode 'bazel-mode "=" 'bazel-buildifier)
 
+#+end_src
+
+*** Bibtex
+
+#+begin_src emacs-lisp
 (leader-set-keys-for-major-mode 'bibtex-mode "s" 'org-ref-sort-bibtex-entry)
 (leader-set-keys-for-major-mode 'bibtex-mode "c" 'bibtex-clean-entry)
 
+#+end_src
+
+*** Buffers
+
+#+begin_src emacs-lisp
 (defun create-scratch-buffer nil
    "create a scratch buffer"
    (interactive)
@@ -571,6 +1207,11 @@
   "br" 'revert-buffer
 )
 
+#+end_src
+
+*** Comments
+
+#+begin_src emacs-lisp
 (defun comment-beginning-of-line ()
   (interactive)
   (comment-line 1)
@@ -581,14 +1222,29 @@
   "cl" 'comment-beginning-of-line
 )
 
+#+end_src
+
+*** C++
+
+#+begin_src emacs-lisp
 (leader-set-keys-for-major-mode 'c++-mode "gd" 'lsp-find-definition)
 (leader-set-keys-for-major-mode 'c++-mode "=" 'lsp-format-buffer)
 
+#+end_src
+
+*** Evaluation
+
+#+begin_src emacs-lisp
 (leader-set-keys
   "e" '(:ignore t :wk "eval")
   "es" 'eval-last-sexp
 )
 
+#+end_src
+
+*** Files
+
+#+begin_src emacs-lisp
 (defun mk/find-user-init-file ()
   (interactive)
   (find-file (expand-file-name "~/.emacs.d/config.org")))
@@ -601,6 +1257,11 @@
   "fed" 'mk/find-user-init-file
 )
 
+#+end_src
+
+*** Git
+
+#+begin_src emacs-lisp
 (leader-set-keys
   "g" '(:ignore t :wk "git")
   "gs" 'magit-status
@@ -613,6 +1274,11 @@
   "gmo" 'smerge-keep-other
 )
 
+#+end_src
+
+*** Help
+
+#+begin_src emacs-lisp
 (leader-set-keys
   "h" '(:ignore t :wk "hel")
   "hv" 'helpful-variable
@@ -620,10 +1286,23 @@
   "ht" 'helpful-at-point
 )
 
+#+end_src
+
+*** LSP
+
+Depending on which mode we are in, we want to use different functions
+for jumping.
+
+#+begin_src emacs-lisp
 (add-hook 'lsp-mode-hook (lambda ()
                            (leader-set-keys
                              "mj" 'lsp-ivy-workspace-symbol)))
 
+#+end_src
+
+*** Org
+
+#+begin_src emacs-lisp
 (leader-set-keys
   "o" '(:ignore t :wk "org-roam")
   "oa" '(:ignore t :wk "agenda")
@@ -665,21 +1344,46 @@
 (leader-set-keys-for-major-mode 'org-mode "o" 'org-open-at-point)
 (leader-set-keys-for-major-mode 'org-mode "j" 'counsel-imenu)
 
+#+end_src
+
+*** Projects
+
+#+begin_src emacs-lisp
 (leader-set-keys
   "/" 'projectile-grep
 )
 
+#+end_src
+
+*** Python
+
+#+begin_src emacs-lisp
 (leader-set-keys-for-major-mode 'python-mode "=" 'yapfify-buffer)
 
+#+end_src
+
+*** R
+
+#+begin_src emacs-lisp
 (leader-set-keys-for-major-mode 'ess-r-mode "s" 'R)
 (leader-set-keys-for-major-mode 'ess-r-mode "c" 'ess-eval-buffer)
 (leader-set-keys-for-major-mode 'ess-r-mode "=" 'lsp-format-buffer)
 
+#+end_src
+
+*** Spelling
+
+#+begin_src emacs-lisp
 (leader-set-keys
   "S" '(:ignore t :wk "Spelling")
   "Sc" 'flyspell-auto-correct-word
 )
 
+#+end_src
+
+*** Substitution
+
+#+begin_src emacs-lisp
 (leader-set-keys
   "s" '(:ignore t :wk "subsitute")
   "se" '(evil-iedit-state/iedit-mode)
@@ -687,6 +1391,11 @@
   "sd" 'sp-splice-sexp
 )
 
+#+end_src
+
+*** TeX
+
+#+begin_src emacs-lisp
 (leader-set-keys-for-major-mode 'latex-mode "c" 'latex/build)
 (leader-set-keys-for-major-mode 'latex-mode "b" 'TeX-command-master)
 (leader-set-keys-for-major-mode 'latex-mode "v" 'TeX-view)
@@ -703,6 +1412,11 @@
 (leader-set-keys-for-major-mode 'latex-mode "xc" 'latex/font-code)
 (leader-set-keys-for-major-mode 'latex-mode "xs" 'latex/font-small-caps)
 
+#+end_src
+
+*** Text
+
+#+begin_src emacs-lisp
 (leader-set-keys
   "x" '(:ignore t :wk "text")
   "xp" 'fill-paragraph
@@ -712,21 +1426,41 @@
   "xT" 'titlecase-region
 )
 
+#+end_src
+
+*** Theme
+
+#+begin_src emacs-lisp
 (leader-set-keys
   "T" '(:ignore t :wk "Theme")
   "Ts" 'nano-toggle-theme
 )
 
+#+end_src
+
+*** Toggles
+
+#+begin_src emacs-lisp
 (leader-set-keys
   "t" '(:ignore t :wk "toggles")
   "ta" 'auto-fill-mode
   "tl" 'toggle-truncate-lines
 )
 
+#+end_src
+
+*** Universal
+
+#+begin_src emacs-lisp
 (leader-set-keys
   "u" 'universal-argument
 )
 
+#+end_src
+
+*** Windows
+
+#+begin_src emacs-lisp
 (defun split-and-follow-vertically ()
   (interactive)
   (split-window-right)
@@ -770,7 +1504,14 @@
   "wR" 'hydra-transient-window-resize/body
 )
 
+#+end_src
+
+*** Zoom
+
+#+begin_src emacs-lisp
 (leader-set-keys
   "z" '(:ignore t :wk "zoom")
   "zx" 'text-scale-adjust
 )
+
+#+end_src
