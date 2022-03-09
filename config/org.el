@@ -17,7 +17,7 @@
   ;; Overwrite default capture template
   (setq org-roam-capture-templates
         '(("d" "default" plain "%?"
-           :target (file+head "${slug}.org" ":PROPERTIES:\n:ID: %(org-id-new)\n:LOGGING: nil\n:END:\n#+title: ${title}\n")
+           :target (file+head "${slug}.org" ":PROPERTIES:\n:ID: %(org-id-new)\n:LOGGING: nil\n:END:\n#+STARTUP: latexpreview\n#+title: ${title}\n")
            :unnarrowed t)
           ))
   )
