@@ -35,23 +35,27 @@
       '((sequence "TODO(t)" "|" "DONE(d!)")
         (sequence "LATER(l)" "NEXT(n)" "WAITING(w)" "ACTIVE(a)" "|" "COMPLETED(c)")))
 
+;; Start week on mondays.
+(setq org-agenda-start-on-weekday 1)
+(setq calendar-week-start-day 1)
+
 ;; Configure custom agenda views
-  (setq org-agenda-custom-commands
-   '(("w" "Workflow Status"
-      ((todo "NEXT"
-            ((org-agenda-overriding-header "Things to do next")
-             (org-agenda-todo-list-sublevels nil)
-             (org-agenda-files org-agenda-files)))
-       (todo "TODO"
-            ((org-agenda-overriding-header "Not pressing")
-             (org-agenda-files org-agenda-files)))
-       (todo "WAITING"
-            ((org-agenda-overriding-header "Waiting for External")
-             (org-agenda-files org-agenda-files)))
-       (todo "LATER"
-            ((org-agenda-overriding-header "Backlog")
-             (org-agenda-files org-agenda-files))) 
-      ))))
+(setq org-agenda-custom-commands
+ '(("w" "Workflow Status"
+    ((todo "NEXT"
+          ((org-agenda-overriding-header "Things to do next")
+           (org-agenda-todo-list-sublevels nil)
+           (org-agenda-files org-agenda-files)))
+     (todo "TODO"
+          ((org-agenda-overriding-header "Not pressing")
+           (org-agenda-files org-agenda-files)))
+     (todo "WAITING"
+          ((org-agenda-overriding-header "Waiting for External")
+           (org-agenda-files org-agenda-files)))
+     (todo "LATER"
+          ((org-agenda-overriding-header "Backlog")
+           (org-agenda-files org-agenda-files))) 
+    ))))
 
 ;; evil org
 (use-package evil-org
