@@ -387,8 +387,9 @@ By specifying `:tangle no` on this block, we disable it.
 ** Company
 
 #+begin_src emacs-lisp
-(use-package company)
-(add-hook 'after-init-hook 'global-company-mode)
+(use-package company
+  :after lsp-mode
+  :hook (lsp-mode . company-mode))
 
 #+end_src
 

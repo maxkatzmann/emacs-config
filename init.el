@@ -155,8 +155,9 @@
   :config
   (amx-mode))
 
-(use-package company)
-(add-hook 'after-init-hook 'global-company-mode)
+(use-package company
+  :after lsp-mode
+  :hook (lsp-mode . company-mode))
 
 (use-package smartparens
   :config
