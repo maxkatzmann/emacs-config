@@ -478,7 +478,6 @@ Improve how dired buffers are displayed.
 #+end_src
 
 * Programming
-
 ** Bazel
 
 #+begin_src emacs-lisp
@@ -736,6 +735,23 @@ Enable LSP in different modes.
 (add-hook 'elm-mode-hook #'lsp)
 (add-hook 'python-mode-hook #'lsp)
 (add-hook 'c++-mode-hook #'lsp)
+
+#+end_src
+
+** Markdown
+
+#+begin_src emacs-lisp
+(use-package markdown-mode
+  :ensure t
+  :mode ("README\\.md\\'" . gfm-mode)
+  :init (setq markdown-command "multimarkdown"))
+
+#+end_src
+
+Preview
+
+#+begin_src emacs-lisp
+(use-package markdown-preview-mode)
 
 #+end_src
 

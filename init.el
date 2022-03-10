@@ -335,6 +335,13 @@
 (add-hook 'python-mode-hook #'lsp)
 (add-hook 'c++-mode-hook #'lsp)
 
+(use-package markdown-mode
+  :ensure t
+  :mode ("README\\.md\\'" . gfm-mode)
+  :init (setq markdown-command "multimarkdown"))
+
+(use-package markdown-preview-mode)
+
 (use-package protobuf-mode)
 
 (use-package python-mode)
