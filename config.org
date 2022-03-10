@@ -416,6 +416,16 @@ The default language should be english.
 
 #+end_src
 
+** Goodies
+
+Allows us to quickly insert the current date.
+
+#+begin_src emacs-lisp
+(defun insert-current-date () (interactive)
+    (insert (shell-command-to-string "echo -n $(date +%Y-%m-%d)")))
+
+#+end_src
+
 * Git
 
 ** Magit
@@ -1545,7 +1555,7 @@ for jumping.
   "wk" 'evil-window-up
   "wK" 'evil-window-move-very-top
   "wt" 'split-to-term
-  "wR" 'hydra-transient-window-resize/body
+  "wr" 'hydra-transient-window-resize/body
 )
 
 #+end_src

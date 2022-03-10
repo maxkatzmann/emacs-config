@@ -167,6 +167,9 @@
 
 (setq-default ispell-dictionary "english")
 
+(defun insert-current-date () (interactive)
+    (insert (shell-command-to-string "echo -n $(date +%Y-%m-%d)")))
+
 (use-package magit)
 (use-package magit-delta)
 (use-package magit-todos)
@@ -787,7 +790,7 @@
   "wk" 'evil-window-up
   "wK" 'evil-window-move-very-top
   "wt" 'split-to-term
-  "wR" 'hydra-transient-window-resize/body
+  "wr" 'hydra-transient-window-resize/body
 )
 
 (leader-set-keys
