@@ -16,7 +16,6 @@
              :custom (straight-use-package-by-default t))
 
 (straight-use-package 'org)
-(package-initialize)
 
 (setq-default evil-kill-on-visual-paste nil)
 
@@ -157,6 +156,7 @@
   (amx-mode))
 
 (use-package company)
+(add-hook 'after-init-hook 'global-company-mode)
 
 (use-package smartparens
   :config
@@ -321,6 +321,19 @@
 (defun latex/font-serif () (interactive) (TeX-font nil ?\C-r))
 (defun latex/font-oblique () (interactive) (TeX-font nil ?\C-s))
 (defun latex/font-upright () (interactive) (TeX-font nil ?\C-u))
+
+(straight-use-package 'lsp-mode)
+(straight-use-package 'lsp-ui)
+(straight-use-package 'lsp-ivy)
+
+(setq lsp-headerline-breadcrumb-enable nil)
+(setq lsp-ui-doc-show-with-mouse nil)
+
+(add-hook 'TeX-mode-hook #'lsp)
+(add-hook 'ess-r-mode-hook #'lsp)
+(add-hook 'elm-mode-hook #'lsp)
+(add-hook 'python-mode-hook #'lsp)
+(add-hook 'c++-mode-hook #'lsp)
 
 (use-package protobuf-mode)
 
