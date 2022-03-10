@@ -376,6 +376,25 @@
 (add-hook 'ess-r-mode-hook (lambda ()
                              (lsp-ui-doc-mode -1)))
 
+(defun efs/configure-eshell ()
+  ;; Save command history when commands are entered
+  (add-hook 'eshell-pre-command-hook 'eshell-save-some-history)
+
+  ;; Truncate buffer for performance
+  (add-to-list 'eshell-output-filter-functions 'eshell-truncate-buffer)
+
+  (setq eshell-history-size         10000
+        eshell-buffer-maximum-lines 10000
+        eshell-hist-ignoredups t
+        eshell-scroll-to-bottom-on-input t))
+
+(use-package eshell
+  :hook (eshell-first-time-mode . efs/configure-eshell)
+  :config
+  (with-eval-after-load 'esh-opt
+    (setq eshell-destroy-buffer-when-process-dies t)
+    (setq eshell-visual-commands '("htop" "zsh" "vim"))))
+
 (defun mk/org-mode-setup ()
   (org-indent-mode))
 
@@ -702,6 +721,9 @@
 (leader-set-keys-for-major-mode 'ess-r-mode "c" 'ess-eval-buffer)
 (leader-set-keys-for-major-mode 'ess-r-mode "=" 'lsp-format-buffer)
 
+(leader-set-keys-for-major-mode 'shell-mode "h" 'counsel-shell-history)
+(leader-set-keys-for-major-mode 'eshell-mode "h" 'counsel-esh-history)
+
 (leader-set-keys
   "S" '(:ignore t :wk "Spelling")
   "Sc" 'flyspell-auto-correct-word
@@ -766,13 +788,13 @@
   (balance-windows)
   (other-window 1))
 
-(defun split-to-term ()
+(defun split-to-shell ()
   (interactive)
   (split-and-follow-horizontally)
   (evil-window-move-very-bottom)
-  (unless (get-buffer "*terminal*")
-    (term "/bin/zsh"))
-  (switch-to-buffer "*terminal*"))
+  (unless (get-buffer "*shell*")
+    (shell))
+  (switch-to-buffer "*shell*"))
 
 ;; Transient state for window resizing
 (defhydra hydra-transient-window-resize (:timeout 4)
@@ -793,7 +815,7 @@
   "wJ" 'evil-window-move-very-bottom
   "wk" 'evil-window-up
   "wK" 'evil-window-move-very-top
-  "wt" 'split-to-term
+  "wt" 'split-to-shell
   "wr" 'hydra-transient-window-resize/body
 )
 
