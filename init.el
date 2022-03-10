@@ -376,25 +376,6 @@
 (add-hook 'ess-r-mode-hook (lambda ()
                              (lsp-ui-doc-mode -1)))
 
-(defun efs/configure-eshell ()
-  ;; Save command history when commands are entered
-  (add-hook 'eshell-pre-command-hook 'eshell-save-some-history)
-
-  ;; Truncate buffer for performance
-  (add-to-list 'eshell-output-filter-functions 'eshell-truncate-buffer)
-
-  (setq eshell-history-size         10000
-        eshell-buffer-maximum-lines 10000
-        eshell-hist-ignoredups t
-        eshell-scroll-to-bottom-on-input t))
-
-(use-package eshell
-  :hook (eshell-first-time-mode . efs/configure-eshell)
-  :config
-  (with-eval-after-load 'esh-opt
-    (setq eshell-destroy-buffer-when-process-dies t)
-    (setq eshell-visual-commands '("htop" "zsh" "vim"))))
-
 (defun mk/org-mode-setup ()
   (org-indent-mode))
 
@@ -722,7 +703,6 @@
 (leader-set-keys-for-major-mode 'ess-r-mode "=" 'lsp-format-buffer)
 
 (leader-set-keys-for-major-mode 'shell-mode "h" 'counsel-shell-history)
-(leader-set-keys-for-major-mode 'eshell-mode "h" 'counsel-esh-history)
 
 (leader-set-keys
   "S" '(:ignore t :wk "Spelling")

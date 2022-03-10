@@ -822,30 +822,6 @@ window manager.
 
 #+end_src
 
-* Shell
-
-#+begin_src emacs-lisp
-(defun efs/configure-eshell ()
-  ;; Save command history when commands are entered
-  (add-hook 'eshell-pre-command-hook 'eshell-save-some-history)
-
-  ;; Truncate buffer for performance
-  (add-to-list 'eshell-output-filter-functions 'eshell-truncate-buffer)
-
-  (setq eshell-history-size         10000
-        eshell-buffer-maximum-lines 10000
-        eshell-hist-ignoredups t
-        eshell-scroll-to-bottom-on-input t))
-
-(use-package eshell
-  :hook (eshell-first-time-mode . efs/configure-eshell)
-  :config
-  (with-eval-after-load 'esh-opt
-    (setq eshell-destroy-buffer-when-process-dies t)
-    (setq eshell-visual-commands '("htop" "zsh" "vim"))))
-
-#+end_src
-
 * Org
 
 Enable org-indent-mode for nicer indentation
@@ -1462,7 +1438,6 @@ for jumping.
 
 #+begin_src emacs-lisp
 (leader-set-keys-for-major-mode 'shell-mode "h" 'counsel-shell-history)
-(leader-set-keys-for-major-mode 'eshell-mode "h" 'counsel-esh-history)
 
 #+end_src
 
