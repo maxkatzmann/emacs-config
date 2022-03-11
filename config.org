@@ -481,12 +481,12 @@ Enable `delta` mode automatically.
 Setup better evil keybindings.
 
 #+begin_src emacs-lisp
-(use-package dired
-  :ensure nil
-  :config
-  (evil-collection-define-key 'normal 'dired-mode-map
-  "h" 'dired-directory-up
-  "l" 'dired-find-file))
+  ;; (use-package dired
+  ;;   :ensure nil
+  ;;   :config
+  ;;   (evil-collection-define-key 'normal 'dired-mode-map
+  ;;   "h" 'dired-directory-up
+  ;;   "l" 'dired-find-file)
 
 #+end_src
 
@@ -496,8 +496,8 @@ Improve how dired buffers are displayed.
 #+begin_src emacs-lisp
 (when (string= system-type "darwin")
   (setq dired-use-ls-dired t
-        insert-directory-program "/usr/local/bin/gls"
-        dired-listing-switches "-aBhl --group-directories-first"))
+        insert-directory-program "/opt/homebrew/bin/gls"
+        dired-listing-switches "-agBhlo --group-directories-first"))
 
 #+end_src
 
