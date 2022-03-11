@@ -159,9 +159,6 @@
   :after lsp-mode
   :hook (lsp-mode . company-mode))
 
-(use-package company-box
-  :hook (company-mode . company-box-mode))
-
 (use-package smartparens
   :config
   (smartparens-global-mode t))
@@ -384,6 +381,7 @@
                              (lsp-ui-doc-mode -1)))
 
 (defun mk/org-mode-setup ()
+  (auto-fill-mode)
   (org-indent-mode))
 
 (use-package org
