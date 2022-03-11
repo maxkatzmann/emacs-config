@@ -199,6 +199,13 @@
   :config
   (projectile-mode +1))
 
+(use-package dired
+  :ensure nil
+  :config
+  (evil-collection-define-key 'normal 'dired-mode-map
+  "h" 'dired-directory-up
+  "l" 'dired-find-file))
+
 (when (string= system-type "darwin")
   (setq dired-use-ls-dired t
         insert-directory-program "/usr/local/bin/gls"
