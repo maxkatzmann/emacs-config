@@ -393,14 +393,6 @@ By specifying `:tangle no` on this block, we disable it.
 
 #+end_src
 
-Company-box makes the completion box a bit more sophisticated.
-
-#+begin_src emacs-lisp
-(use-package company-box
-  :hook (company-mode . company-box-mode))
-
-#+end_src
-
 ** Parentheses
 
 #+begin_src emacs-lisp
