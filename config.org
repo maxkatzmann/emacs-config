@@ -820,6 +820,7 @@ Enable org-indent-mode for nicer indentation
 
 #+begin_src emacs-lisp
 (defun mk/org-mode-setup ()
+  (auto-fill-mode)
   (org-indent-mode))
 
 (use-package org

@@ -374,6 +374,7 @@
                              (lsp-ui-doc-mode -1)))
 
 (defun mk/org-mode-setup ()
+  (auto-fill-mode)
   (org-indent-mode))
 
 (use-package org
