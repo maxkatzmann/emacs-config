@@ -39,6 +39,37 @@
   :config
   (setq cycle-resize-steps '(75 50 25 50)))
 
+(defun mk/enlarge-window ()
+  (interactive)
+  (enlarge-window-horizontally 10)
+  (enlarge-window 5))
+
+
+(defun mk/shrink-window ()
+  (interactive)
+  (shrink-window-horizontally 10)
+  (shrink-window 5))
+
+(defun split-and-follow-vertically ()
+  (interactive)
+  (split-window-right)
+  (balance-windows)
+  (other-window 1))
+
+(defun split-and-follow-horizontally ()
+  (interactive)
+  (split-window-below)
+  (balance-windows)
+  (other-window 1))
+
+(defun split-to-shell ()
+  (interactive)
+  (split-and-follow-horizontally)
+  (evil-window-move-very-bottom)
+  (unless (get-buffer "*shell*")
+    (shell))
+  (switch-to-buffer "*shell*"))
+
 (straight-use-package
   '(nano-emacs :type git :host github :repo "rougier/nano-emacs"))
 (require 'nano)
@@ -196,12 +227,13 @@
   :config
   (projectile-mode +1))
 
-;; (use-package dired
-;;   :ensure nil
-;;   :config
-;;   (evil-collection-define-key 'normal 'dired-mode-map
-;;   "h" 'dired-directory-up
-;;   "l" 'dired-find-file)
+(use-package dired-hide-dotfiles
+  :hook (dired-mode . dired-hide-dotfiles-mode)
+  :config
+  (evil-collection-define-key 'normal 'dired-mode-map
+  "H" 'dired-hide-dotfiles-mode
+  "h" 'dired-up-directory
+  "l" 'dired-find-file))
 
 (when (string= system-type "darwin")
   (setq dired-use-ls-dired t
@@ -761,29 +793,12 @@
   "u" 'universal-argument
 )
 
-(defun split-and-follow-vertically ()
-  (interactive)
-  (split-window-right)
-  (balance-windows)
-  (other-window 1))
-
-(defun split-and-follow-horizontally ()
-  (interactive)
-  (split-window-below)
-  (balance-windows)
-  (other-window 1))
-
-(defun split-to-shell ()
-  (interactive)
-  (split-and-follow-horizontally)
-  (evil-window-move-very-bottom)
-  (unless (get-buffer "*shell*")
-    (shell))
-  (switch-to-buffer "*shell*"))
-
 ;; Transient state for window resizing
 (defhydra hydra-transient-window-resize (:timeout 4)
   "resize window vertically"
+  ("+" mk/enlarge-window "enlarge window")
+  ("-" mk/shrink-window "shrink window")
+  ("=" balance-windows "balance windows")
   ("s" cycle-resize-window-vertically "resize vertically")
   ("v" cycle-resize-window-horizontally "resize horizontally"))
 
