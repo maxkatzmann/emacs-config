@@ -97,13 +97,59 @@ the center.
 
 #+end_src
 
-** Window Resizing
+** Windowing
 
 #+begin_src emacs-lisp
 (use-package cycle-resize
   :config
   (setq cycle-resize-steps '(75 50 25 50)))
 
+#+end_src
+
+Functions for shrinking and enlarging windows.
+
+#+begin_src emacs-lisp
+(defun mk/enlarge-window ()
+  (interactive)
+  (enlarge-window-horizontally 10)
+  (enlarge-window 5))
+
+
+(defun mk/shrink-window ()
+  (interactive)
+  (shrink-window-horizontally 10)
+  (shrink-window 5))
+
+#+end_src
+
+Functions for splitting windows.
+
+#+begin_src emacs-lisp
+(defun split-and-follow-vertically ()
+  (interactive)
+  (split-window-right)
+  (balance-windows)
+  (other-window 1))
+
+(defun split-and-follow-horizontally ()
+  (interactive)
+  (split-window-below)
+  (balance-windows)
+  (other-window 1))
+
+
+#+end_src
+
+Splitting to a terminal.
+
+#+begin_src emacs-lisp
+(defun split-to-shell ()
+  (interactive)
+  (split-and-follow-horizontally)
+  (evil-window-move-very-bottom)
+  (unless (get-buffer "*shell*")
+    (shell))
+  (switch-to-buffer "*shell*"))
 #+end_src
 
 * Theme
@@ -487,15 +533,30 @@ Enable `delta` mode automatically.
 
 ** Dired
 
+Hide dot-files by default and setup better evil keybindings.
+
+#+begin_src emacs-lisp
+(use-package dired-hide-dotfiles
+  :hook (dired-mode . dired-hide-dotfiles-mode)
+  :config
+  (evil-collection-define-key 'normal 'dired-mode-map
+  "H" 'dired-hide-dotfiles-mode
+  "h" 'dired-up-directory
+  "l" 'dired-find-file))
+
+#+end_src
+
+
 Improve how dired buffers are displayed.
 
 #+begin_src emacs-lisp
 (when (string= system-type "darwin")
   (setq dired-use-ls-dired t
-        insert-directory-program "/usr/local/bin/gls"
-        dired-listing-switches "-aBhl --group-directories-first"))
+        insert-directory-program "/opt/homebrew/bin/gls"
+        dired-listing-switches "-agBhlo --group-directories-first"))
 
 #+end_src
+
 
 * Programming
 ** Bazel
@@ -1553,29 +1614,14 @@ Transient state for inserting Special characters. (äÄüÜöÖß)
 *** Windows
 
 #+begin_src emacs-lisp
-(defun split-and-follow-vertically ()
-  (interactive)
-  (split-window-right)
-  (balance-windows)
-  (other-window 1))
 
-(defun split-and-follow-horizontally ()
-  (interactive)
-  (split-window-below)
-  (balance-windows)
-  (other-window 1))
-
-(defun split-to-shell ()
-  (interactive)
-  (split-and-follow-horizontally)
-  (evil-window-move-very-bottom)
-  (unless (get-buffer "*shell*")
-    (shell))
-  (switch-to-buffer "*shell*"))
 
 ;; Transient state for window resizing
 (defhydra hydra-transient-window-resize (:timeout 4)
-  "resize windows cyclically"
+  "resize window cyclically"
+  ("+" mk/enlarge-window "enlarge window")
+  ("-" mk/shrink-window "shrink window")
+  ("=" balance-windows "balance windows")
   ("s" cycle-resize-window-vertically "resize vertically")
   ("v" cycle-resize-window-horizontally "resize horizontally"))
 
