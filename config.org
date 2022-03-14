@@ -427,6 +427,15 @@ Allows us to quickly insert the current date.
 
 #+end_src
 
+Simple function that allows inserting characters. Useful for shortcuts
+related to Umlaut-characters.
+
+#+begin_src emacs-lisp
+(defun mk/insert-character (char)
+  (interactive)
+  (insert char))
+#+end_src
+
 * Git
 
 ** Magit
@@ -1436,11 +1445,30 @@ for jumping.
 
 *** Spelling
 
+Correct spelling.
+
 #+begin_src emacs-lisp
 (leader-set-keys
   "S" '(:ignore t :wk "Spelling")
   "Sc" 'flyspell-auto-correct-word
 )
+
+#+end_src
+
+Transient state for inserting Special characters. (äÄüÜöÖß)
+
+#+begin_src emacs-lisp
+(defhydra hydra-transient-special-characters (:timeout 4)
+   "Insert special character"
+   ("a" (mk/insert-character "ä") "ä")
+   ("A" (mk/insert-character "Ä") "Ä")
+   ("u" (mk/insert-character "ü") "ü")
+   ("U" (mk/insert-character "Ü") "Ü")
+   ("o" (mk/insert-character "ö") "ö")
+   ("O" (mk/insert-character "Ö") "Ö")
+   ("s" (mk/insert-character "ß") "ß")
+   ("e" (mk/insert-character "€") "€")
+  )
 
 #+end_src
 
@@ -1487,6 +1515,7 @@ for jumping.
   "xC" 'capitalize-word
   "xL" 'downcase-word
   "xT" 'titlecase-region
+  "xi" 'hydra-transient-special-characters/body
 )
 
 #+end_src
@@ -1546,7 +1575,7 @@ for jumping.
 
 ;; Transient state for window resizing
 (defhydra hydra-transient-window-resize (:timeout 4)
-  "resize window vertically"
+  "resize windows cyclically"
   ("s" cycle-resize-window-vertically "resize vertically")
   ("v" cycle-resize-window-horizontally "resize horizontally"))
 

@@ -171,6 +171,10 @@
 (defun insert-current-date () (interactive)
     (insert (shell-command-to-string "echo -n $(date +%Y-%m-%d)")))
 
+(defun mk/insert-character (char)
+  (interactive)
+  (insert char))
+
 (use-package magit)
 (use-package magit-delta)
 (use-package magit-todos)
@@ -707,6 +711,18 @@
   "Sc" 'flyspell-auto-correct-word
 )
 
+(defhydra hydra-transient-special-characters (:timeout 4)
+   "Insert special character"
+   ("a" (mk/insert-character "ä") "ä")
+   ("A" (mk/insert-character "Ä") "Ä")
+   ("u" (mk/insert-character "ü") "ü")
+   ("U" (mk/insert-character "Ü") "Ü")
+   ("o" (mk/insert-character "ö") "ö")
+   ("O" (mk/insert-character "Ö") "Ö")
+   ("s" (mk/insert-character "ß") "ß")
+   ("e" (mk/insert-character "€") "€")
+  )
+
 (leader-set-keys
   "s" '(:ignore t :wk "subsitute")
   "se" '(evil-iedit-state/iedit-mode)
@@ -737,6 +753,7 @@
   "xC" 'capitalize-word
   "xL" 'downcase-word
   "xT" 'titlecase-region
+  "xi" 'hydra-transient-special-characters/body
 )
 
 (leader-set-keys
@@ -776,7 +793,7 @@
 
 ;; Transient state for window resizing
 (defhydra hydra-transient-window-resize (:timeout 4)
-  "resize window vertically"
+  "resize windows cyclically"
   ("s" cycle-resize-window-vertically "resize vertically")
   ("v" cycle-resize-window-horizontally "resize horizontally"))
 
