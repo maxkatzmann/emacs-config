@@ -23,7 +23,9 @@
 
 (use-package undo-tree
   :config
-  (global-undo-tree-mode))
+  (global-undo-tree-mode)
+  :custom
+  (undo-tree-auto-save-history nil))
 
 (use-package titlecase)
 
@@ -62,13 +64,21 @@
   (balance-windows)
   (other-window 1))
 
-(defun split-to-shell ()
-  (interactive)
-  (split-and-follow-horizontally)
-  (evil-window-move-very-bottom)
-  (unless (get-buffer "*shell*")
-    (shell))
-  (switch-to-buffer "*shell*"))
+(defun mk/split-to-shell ()
+   "If no *shell* buffer exists, one is created using the `shell` function
+and it is displayed in a new window at the ver bottom. If such a window is
+shown already, it is deleted instead."
+   (interactive)
+   (let ((shell-window (get-buffer-window "*shell*")))
+     (if shell-window
+        (progn
+          (delete-window shell-window))
+         (progn
+         (split-and-follow-horizontally)
+         (evil-window-move-very-bottom)
+         (unless (get-buffer "*shell*")
+           (shell))
+         (switch-to-buffer "*shell*")))))
 
 (straight-use-package
   '(nano-emacs :type git :host github :repo "rougier/nano-emacs"))
@@ -241,7 +251,8 @@
 
 (when (string= system-type "darwin")
   (setq dired-use-ls-dired t
-        insert-directory-program "/opt/homebrew/bin/gls"
+        ;; On M1 Macs this needs to be /opt/homebrew/bin/gls.
+        insert-directory-program "/usr/local/bin/gls"
         dired-listing-switches "-agBhlo --group-directories-first"))
 
 (use-package bazel
@@ -256,6 +267,9 @@
                            (setq lsp-ui-doc-mode -1)
                            (require 'clang-format)
                            (require 'cpp-auto-include)))
+
+(add-hook 'csv-mode-hook (lambda ()
+  (csv-align-mode)))
 
 (use-package elm-mode)
 
@@ -832,7 +846,7 @@
   "wJ" 'evil-window-move-very-bottom
   "wk" 'evil-window-up
   "wK" 'evil-window-move-very-top
-  "wt" 'split-to-shell
+  "wt" 'mk/split-to-shell
   "wr" 'hydra-transient-window-resize/body
 )
 
