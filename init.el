@@ -33,7 +33,9 @@
   :config
   (exec-path-from-shell-copy-envs '("LANG" "LC_ALL" "LC_CTYPES")))
 
-(use-package writeroom-mode)
+(use-package writeroom-mode
+  :custom
+  (writeroom-fullscreen-effect 'maximized))
 
 (use-package helpful)
 
@@ -746,6 +748,7 @@ shown already, it is deleted instead."
 (leader-set-keys-for-major-mode 'org-mode "ic" 'mk/org-insert-src-block)
 (leader-set-keys-for-major-mode 'org-mode "o" 'org-open-at-point)
 (leader-set-keys-for-major-mode 'org-mode "j" 'counsel-imenu)
+(leader-set-keys-for-major-mode 'org-mode "c" 'org-toggle-checkbox)
 
 (leader-set-keys
   "/" 'projectile-grep
