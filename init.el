@@ -600,6 +600,10 @@ shown already, it is deleted instead."
   :config
   (evil-exchange-install))
 
+(use-package evil-matchit
+  :init
+  (global-evil-matchit-mode 1))
+
 (use-package which-key
   :config
   (which-key-setup-minibuffer)
@@ -851,6 +855,7 @@ shown already, it is deleted instead."
   "wK" 'evil-window-move-very-top
   "wt" 'mk/split-to-shell
   "wr" 'hydra-transient-window-resize/body
+  "ww" 'writeroom-mode
 )
 
 (leader-set-keys

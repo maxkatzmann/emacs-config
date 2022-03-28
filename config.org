@@ -1241,6 +1241,14 @@ Evil-exchange can be used to swap selections.
 
 #+end_src
 
+Evil-matchit to be able to jump between tags (e.g. begin/end in LaTeX)
+
+#+begin_src emacs-lisp
+(use-package evil-matchit
+  :init
+  (global-evil-matchit-mode 1))
+#+end_src
+
 ** Which Key
 
 Shows a an overview of the currently available keybindings.
@@ -1637,8 +1645,6 @@ Transient state for inserting Special characters. (äÄüÜöÖß)
 *** Windows
 
 #+begin_src emacs-lisp
-
-
 ;; Transient state for window resizing
 (defhydra hydra-transient-window-resize (:timeout 4)
   "resize window cyclically"
@@ -1663,6 +1669,7 @@ Transient state for inserting Special characters. (äÄüÜöÖß)
   "wK" 'evil-window-move-very-top
   "wt" 'mk/split-to-shell
   "wr" 'hydra-transient-window-resize/body
+  "ww" 'writeroom-mode
 )
 
 #+end_src
