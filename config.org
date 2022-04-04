@@ -183,6 +183,7 @@ Set the default font for everything
 
 #+begin_src emacs-lisp
 (setq nano-font-family-monospaced "Roboto Mono")
+(setq nano-font-family-proportional "Roboto")
 
 #+end_src
 
@@ -454,9 +455,10 @@ By specifying `:tangle no` on this block, we disable it.
 ** Parentheses
 
 #+begin_src emacs-lisp
-(use-package smartparens
-  :config
-  (smartparens-global-mode t))
+ (use-package smartparens
+   :config
+   (sp-pair "$" "$")
+   (smartparens-global-mode t))
 
 #+end_src
 
@@ -492,6 +494,14 @@ related to Umlaut-characters.
 (defun mk/insert-character (char)
   (interactive)
   (insert char))
+#+end_src
+
+Package for changing accents after writing letters.
+
+#+begin_src emacs-lisp
+(use-package accent
+  :config
+  (setq accent-position 'after))
 #+end_src
 
 * Git
@@ -616,6 +626,33 @@ Enable formatting on save
 (add-hook 'elm-mode-hook (lambda ()
                            (lsp-ui-doc-mode -1)
                            (elm-format-on-save-mode 1)))
+#+end_src
+
+** JavaScript
+
+General JavaScript support
+
+#+begin_src emacs-lisp
+(use-package js2-mode
+  :config
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode)))
+
+#+end_src
+
+Support JavaScript imports
+
+#+begin_src emacs-lisp
+(use-package import-js)
+
+#+end_src
+
+Support for formatting of JavaScript code
+
+#+begin_src emacs-lisp
+(use-package prettier-js
+  :after js2-mode
+  :hook (js2-mode . prettier-js-mode))
+
 #+end_src
 
 ** LaTeX
@@ -837,6 +874,7 @@ Enable LSP in different modes.
 (add-hook 'elm-mode-hook #'lsp)
 (add-hook 'python-mode-hook #'lsp)
 (add-hook 'c++-mode-hook #'lsp)
+(add-hook 'js2-mode-hook #'lsp)
 
 #+end_src
 
@@ -992,7 +1030,7 @@ logging of state changes, e.g., when a TODO is changed to DONE.)
   ;; Overwrite default capture template
   (setq org-roam-capture-templates
         '(("d" "default" plain "%?"
-           :target (file+head "${slug}.org" ":PROPERTIES:\n:ID: %(org-id-new)\n:LOGGING: nil\n:END:\n#+STARTUP: latexpreview\n#+title: ${title}\n")
+           :target (file+head "${slug}.org" ":PROPERTIES:\n:ID: %(org-id-new)\n:LOGGING: nil\n:END:\n#+title: ${title}\n")
            :unnarrowed t)
           ))
   )
@@ -1543,6 +1581,7 @@ Correct spelling.
 (leader-set-keys
   "S" '(:ignore t :wk "Spelling")
   "Sc" 'flyspell-auto-correct-word
+  "Sn" 'flyspell-goto-next-error
 )
 
 #+end_src
@@ -1600,15 +1639,16 @@ Transient state for inserting Special characters. (äÄüÜöÖß)
 *** Text
 
 #+begin_src emacs-lisp
-(leader-set-keys
-  "x" '(:ignore t :wk "text")
-  "xp" 'fill-paragraph
-  "xP" 'unfill-paragraph
-  "xC" 'capitalize-word
-  "xL" 'downcase-word
-  "xT" 'titlecase-region
-  "xi" 'hydra-transient-special-characters/body
-)
+  (leader-set-keys
+    "x" '(:ignore t :wk "text")
+    "xp" 'fill-paragraph
+    "xP" 'unfill-paragraph
+    "xC" 'capitalize-word
+    "xL" 'downcase-word
+    "xT" 'titlecase-region
+    "xa" 'accent-menu
+    "xi" 'hydra-transient-special-characters/body
+  )
 
 #+end_src
 

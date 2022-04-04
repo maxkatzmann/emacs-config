@@ -89,6 +89,7 @@ shown already, it is deleted instead."
 (require 'nano-theme-dark)
 
 (setq nano-font-family-monospaced "Roboto Mono")
+(setq nano-font-family-proportional "Roboto")
 
 (setq font-lock-maximum-decoration t)
 (setq font-lock-maximum-size 256000)
@@ -204,6 +205,7 @@ shown already, it is deleted instead."
 
 (use-package smartparens
   :config
+  (sp-pair "$" "$")
   (smartparens-global-mode t))
 
 (dolist (hook '(text-mode-hook))
@@ -217,6 +219,10 @@ shown already, it is deleted instead."
 (defun mk/insert-character (char)
   (interactive)
   (insert char))
+
+(use-package accent
+  :config
+  (setq accent-position 'after))
 
 (use-package magit)
 (use-package magit-delta)
@@ -278,6 +284,16 @@ shown already, it is deleted instead."
 (add-hook 'elm-mode-hook (lambda ()
                            (lsp-ui-doc-mode -1)
                            (elm-format-on-save-mode 1)))
+
+(use-package js2-mode
+  :config
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode)))
+
+(use-package import-js)
+
+(use-package prettier-js
+  :after js2-mode
+  :hook (js2-mode . prettier-js-mode))
 
 (straight-use-package 'auctex)
 (use-package ivy-bibtex)
@@ -397,6 +413,7 @@ shown already, it is deleted instead."
 (add-hook 'elm-mode-hook #'lsp)
 (add-hook 'python-mode-hook #'lsp)
 (add-hook 'c++-mode-hook #'lsp)
+(add-hook 'js2-mode-hook #'lsp)
 
 (use-package markdown-mode
   :ensure t
@@ -483,7 +500,7 @@ shown already, it is deleted instead."
   ;; Overwrite default capture template
   (setq org-roam-capture-templates
         '(("d" "default" plain "%?"
-           :target (file+head "${slug}.org" ":PROPERTIES:\n:ID: %(org-id-new)\n:LOGGING: nil\n:END:\n#+STARTUP: latexpreview\n#+title: ${title}\n")
+           :target (file+head "${slug}.org" ":PROPERTIES:\n:ID: %(org-id-new)\n:LOGGING: nil\n:END:\n#+title: ${title}\n")
            :unnarrowed t)
           ))
   )
@@ -769,6 +786,7 @@ shown already, it is deleted instead."
 (leader-set-keys
   "S" '(:ignore t :wk "Spelling")
   "Sc" 'flyspell-auto-correct-word
+  "Sn" 'flyspell-goto-next-error
 )
 
 (defhydra hydra-transient-special-characters (:timeout 4)
@@ -813,6 +831,7 @@ shown already, it is deleted instead."
   "xC" 'capitalize-word
   "xL" 'downcase-word
   "xT" 'titlecase-region
+  "xa" 'accent-menu
   "xi" 'hydra-transient-special-characters/body
 )
 
