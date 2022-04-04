@@ -975,7 +975,7 @@ Utilize a more modern look for org-mode.
 #+begin_src emacs-lisp
 (use-package org-modern
   :hook ((org-mode . org-modern-mode)
-         (org-agenda-finalie . org-modern-agenda)))
+         (org-agenda-finalize . org-modern-agenda)))
 #+end_src
 
 Disable folding of double empty lines.

@@ -466,7 +466,7 @@ shown already, it is deleted instead."
 
 (use-package org-modern
   :hook ((org-mode . org-modern-mode)
-         (org-agenda-finalie . org-modern-agenda)))
+         (org-agenda-finalize . org-modern-agenda)))
 
 (setq org-cycle-separator-lines -2)
 
