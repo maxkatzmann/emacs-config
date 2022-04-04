@@ -970,6 +970,14 @@ Custom heights for org-mode section titles.
 
 #+end_src
 
+Utilize a more modern look for org-mode.
+
+#+begin_src emacs-lisp
+(use-package org-modern
+  :hook ((org-mode . org-modern-mode)
+         (org-agenda-finalie . org-modern-agenda)))
+#+end_src
+
 Disable folding of double empty lines.
 
 #+begin_src emacs-lisp

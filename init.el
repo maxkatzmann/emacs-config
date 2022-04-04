@@ -464,6 +464,10 @@ shown already, it is deleted instead."
   (set-face-attribute 'org-level-2 nil :height 1.2))
 (add-hook 'org-mode-hook #'font-height-org-mode-hook)
 
+(use-package org-modern
+  :hook ((org-mode . org-modern-mode)
+         (org-agenda-finalie . org-modern-agenda)))
+
 (setq org-cycle-separator-lines -2)
 
 (require 'org-tempo)
