@@ -564,7 +564,8 @@ Hide dot-files by default and setup better evil keybindings.
   (evil-collection-define-key 'normal 'dired-mode-map
   "H" 'dired-hide-dotfiles-mode
   "h" 'dired-up-directory
-  "l" 'dired-find-file))
+  "l" 'dired-find-file
+  (kbd "SPC") 'counsel-M-x))
 
 #+end_src
 
@@ -578,6 +579,12 @@ Improve how dired buffers are displayed.
         insert-directory-program "/usr/local/bin/gls"
         dired-listing-switches "-agBhlo --group-directories-first"))
 
+#+end_src
+
+Use dirvish as dired alternative.
+
+#+begin_src emacs-lisp
+(use-package dirvish)
 #+end_src
 
 * Programming
@@ -1368,7 +1375,7 @@ Allows us to use SPC for all kinds of actions, just like spacemacs.
 #+begin_src emacs-lisp
 (leader-set-keys
   "a" '(:ignore t :wk "applications")
-  "ad" 'dired
+  "ad" 'dirvish-dired
 )
 
 #+end_src

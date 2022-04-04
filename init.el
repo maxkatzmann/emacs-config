@@ -255,13 +255,16 @@ shown already, it is deleted instead."
   (evil-collection-define-key 'normal 'dired-mode-map
   "H" 'dired-hide-dotfiles-mode
   "h" 'dired-up-directory
-  "l" 'dired-find-file))
+  "l" 'dired-find-file
+  (kbd "SPC") 'counsel-M-x))
 
 (when (string= system-type "darwin")
   (setq dired-use-ls-dired t
         ;; On M1 Macs this needs to be /opt/homebrew/bin/gls.
         insert-directory-program "/usr/local/bin/gls"
         dired-listing-switches "-agBhlo --group-directories-first"))
+
+(use-package dirvish)
 
 (use-package bazel
   :config
@@ -655,7 +658,7 @@ shown already, it is deleted instead."
 
 (leader-set-keys
   "a" '(:ignore t :wk "applications")
-  "ad" 'dired
+  "ad" 'dirvish-dired
 )
 
 (leader-set-keys-for-major-mode 'bazel-mode "=" 'bazel-buildifier)
