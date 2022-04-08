@@ -165,7 +165,6 @@ shown already, it is deleted instead."
 #+end_src
 
 * Theme
-
 ** Nano
 
 #+begin_src emacs-lisp
@@ -586,6 +585,20 @@ Use dirvish as dired alternative.
 #+begin_src emacs-lisp
 (use-package dirvish)
 #+end_src
+
+Configure that certain files are opened externally.
+
+#+begin_src emacs-lisp
+(straight-use-package
+  '(openwith :type git :host github :repo "garberw/openwith"))
+(require 'openwith)
+(setq openwith-associations
+  (list
+    '("\\.ipe" "/Applications/Ipe.app/Contents/MacOS/ipe" (file))
+    '("\\.pdf" "/Applications/Skim.app/Contents/MacOS/Skim" (file))))
+(openwith-mode 1)
+#+end_src
+
 
 * Programming
 ** Bazel
@@ -1595,6 +1608,7 @@ Correct spelling.
 #+begin_src emacs-lisp
 (leader-set-keys
   "S" '(:ignore t :wk "Spelling")
+  "Sb" 'flyspell-buffer
   "Sc" 'flyspell-auto-correct-word
   "Sn" 'flyspell-goto-next-error
 )

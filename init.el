@@ -266,6 +266,15 @@ shown already, it is deleted instead."
 
 (use-package dirvish)
 
+(straight-use-package
+  '(openwith :type git :host github :repo "garberw/openwith"))
+(require 'openwith)
+(setq openwith-associations
+  (list
+    '("\\.ipe" "/Applications/Ipe.app/Contents/MacOS/ipe" (file))
+    '("\\.pdf" "/Applications/Skim.app/Contents/MacOS/Skim" (file))))
+(openwith-mode 1)
+
 (use-package bazel
   :config
   (setq bazel-buildifier-before-save t))
@@ -792,6 +801,7 @@ shown already, it is deleted instead."
 
 (leader-set-keys
   "S" '(:ignore t :wk "Spelling")
+  "Sb" 'flyspell-buffer
   "Sc" 'flyspell-auto-correct-word
   "Sn" 'flyspell-goto-next-error
 )
