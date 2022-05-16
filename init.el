@@ -17,6 +17,8 @@
 
 (straight-use-package 'org)
 
+(server-start)
+
 (setq-default evil-kill-on-visual-paste nil)
 
 (use-package unfill)
@@ -90,6 +92,7 @@ shown already, it is deleted instead."
 
 (setq nano-font-family-monospaced "Roboto Mono")
 (setq nano-font-family-proportional "Roboto")
+(setq nano-font-size 10)
 
 (setq font-lock-maximum-decoration t)
 (setq font-lock-maximum-size 256000)
@@ -146,6 +149,162 @@ shown already, it is deleted instead."
 (nano-theme-set-light)
 (nano-refresh-theme)
 
+(defun efs/run-in-background (command)
+    (let ((command-parts (split-string command "[ ]+")))
+      (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
+
+  (defun efs/exwm-init-hook ()
+    ;; Make workspace 1 be the one where we land at startup
+    (exwm-workspace-switch-create 1)
+
+    ;; Open eshell by default
+    ;;(eshell)
+
+    ;; NOTE: The next two are disabled because we now use Polybar!
+
+    ;; Show battery status in the mode line
+    ;;(display-battery-mode 1)
+
+    ;; Show the time and date in modeline
+    ;;(setq display-time-day-and-date t)
+    ;;(display-time-mode 1)
+    ;; Also take a look at display-time-format and format-time-string
+
+    ;; Start the Polybar panel
+    (efs/start-panel)
+
+    ;; Launch apps that will run in the background
+    ;; (efs/run-in-background "dunst")
+    (efs/run-in-background "nm-applet")
+    ;; (efs/run-in-background "pasystray")
+    ;; (efs/run-in-background "blueman-applet")
+  )
+
+  (defun efs/exwm-update-class ()
+    (exwm-workspace-rename-buffer exwm-class-name))
+
+  ;; (defun efs/exwm-configure-window-by-class ()
+  ;;   (interactive)
+  ;;   (pcase exwm-class-name
+  ;;      ))
+
+  (use-package exwm :config
+    (setq exwm-workspace-number 5)
+
+    (add-hook 'exwm-init-hook #'efs/exwm-init-hook)
+
+    ;; When window "class" updates, use it to set the buffer name
+    (add-hook 'exwm-update-class-hook #'efs/exwm-update-class)
+
+    ;; Automatically send the mouse cursor to the selected workspace's display
+    (setq exwm-workspace-warp-cursor t)
+
+    ;; Window focus should follow the mouse pointer
+    (setq mouse-autoselect-window t
+          focus-follows-mouse t)
+
+    ;; These keys should always pass through to Emacs
+;; These keys should always pass through to Emacs
+  (setq exwm-input-prefix-keys
+    '(?\C-x
+      ?\C-u
+      ?\C-h
+      ?\M-x
+      ?\M-\  
+      ?\M-`
+      ?\M-&
+      ?\M-:
+      ?\C-\M-j  ;; Buffer list
+      ?\C-\ ))  ;; Ctrl+Space
+
+  ;; Ctrl+Q will enable the next key to be sent directly
+  (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
+
+  ;; Set up global key bindings.  These always work, no matter the input state!
+  ;; Keep in mind that changing this list after EXWM initializes has no effect.
+  (setq exwm-input-global-keys
+        `(
+          ;; Reset to line-mode (C-c C-k switches to char-mode via exwm-input-release-keyboard)
+          ([?\s-r] . exwm-reset)
+
+          ;; Move between windows
+          ([?\s-h] . windmove-left)
+          ([?\s-l] . windmove-right)
+          ([?\s-k] . windmove-up)
+          ([?\s-j] . windmove-down)
+
+          ;; Launch applications via shell command
+          ([?\s-&] . (lambda (command)
+                       (interactive (list (read-shell-command "$ ")))
+                       (start-process-shell-command command nil command)))
+
+          ;; Switch workspace
+          ([?\s-w] . exwm-workspace-switch)
+          ([?\s-`] . (lambda () (interactive) (exwm-workspace-switch-create 0)))
+
+          ;; s-Shift-N to move a window to a workspace
+          ([?\s-!] . (lambda () (interactive) (exwm-workspace-move-window 1)))
+          ([?\s-@] . (lambda () (interactive) (exwm-workspace-move-window 2)))
+          ([?\s-#] . (lambda () (interactive) (exwm-workspace-move-window 3)))
+          ([?\s-$] . (lambda () (interactive) (exwm-workspace-move-window 4)))
+          ([?\s-%] . (lambda () (interactive) (exwm-workspace-move-window 5)))
+          ([?\s-^] . (lambda () (interactive) (exwm-workspace-move-window 6)))
+          ([?\s-&] . (lambda () (interactive) (exwm-workspace-move-window 7)))
+          ([?\s-*] . (lambda () (interactive) (exwm-workspace-move-window 8)))
+          ;; ([?\s-(] . (lambda () (interactive) (exwm-workspace-move-window 9)))
+          ;; ([?\s-)] . (lambda () (interactive) (exwm-workspace-move-window 0)))
+
+          ;; 's-N': Switch to certain workspace with Super (Win) plus a number key (0 - 9)
+          ,@(mapcar (lambda (i)
+                      `(,(kbd (format "s-%d" i)) .
+                        (lambda ()
+                          (interactive)
+                          (exwm-workspace-switch-create ,i))))
+                    (number-sequence 0 9))))
+
+      (exwm-input-set-key (kbd "s-SPC") 'counsel-linux-app)
+      (exwm-input-set-key (kbd "M-SPC") 'counsel-M-x)
+
+      (exwm-enable))
+
+(use-package desktop-environment
+  :after exwm
+  :config 
+  (setq desktop-environment-update-exwm-global-keys :prefix)
+  (define-key desktop-environment-mode-map (kbd "s-l") nil)
+  (desktop-environment-mode)
+  :custom
+  (desktop-environment-brightness-small-increment "2%+")
+  (desktop-environment-brightness-small-decrement "2%-")
+  (desktop-environment-brightness-normal-increment "5%+")
+  (desktop-environment-brightness-normal-decrement "5%-"))
+
+;; (use-package edwina)
+
+(defvar efs/polybar-process nil
+  "Holds the process of the running Polybar instance, if any")
+
+(defun efs/kill-panel ()
+  (interactive)
+  (when efs/polybar-process
+    (ignore-errors
+      (kill-process efs/polybar-process)))
+  (setq efs/polybar-process nil))
+
+(defun efs/start-panel ()
+  (interactive)
+  (efs/kill-panel)
+  (setq efs/polybar-process (start-process-shell-command "polybar" nil "polybar panel")))
+
+(defun efs/send-polybar-hook (module-name hook-index)
+  (start-process-shell-command "polybar-msg" nil (format "polybar-msg hook %s %s" module-name hook-index)))
+
+(defun efs/send-polybar-exwm-workspace ()
+  (efs/send-polybar-hook "exwm-workspace" 1))
+
+;; Update panel indicator when workspace changes
+(add-hook 'exwm-workspace-switch-hook #'efs/send-polybar-exwm-workspace)
+
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 
@@ -183,7 +342,11 @@ shown already, it is deleted instead."
               (svg-lib-tag value nil
                            :stroke 0 :margin 0)) :ascent 'center)))
 
-(use-package counsel)
+(use-package counsel
+  :custom
+  (counsel-linux-app-format-function #'counsel-linux-app-format-function-name-only)
+  :config
+  (counsel-mode 1))
 
 (use-package ivy
   :config
@@ -306,30 +469,6 @@ shown already, it is deleted instead."
 (use-package prettier-js
   :after js2-mode
   :hook (js2-mode . prettier-js-mode))
-
-(straight-use-package 'auctex)
-(use-package ivy-bibtex)
-
-(setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin/"))
-(setq exec-path (append exec-path '("/Library/TeX/texbin/")))
-
-(setq TeX-error-overview-open-after-TeX-run t)
-
-(setq TeX-source-correlate-mode t)
-(setq TeX-source-correlate-start-server t)
-(setq TeX-source-correlate-method 'synctex)
-
-(setq TeX-view-program-list
-      '(("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")))
-(setq TeX-view-program-selection '((output-pdf "Skim")))
-
-(add-hook 'TeX-mode-hook (lambda ()
-                           (lsp-ui-doc-mode -1)
-                           (setq fill-column 70)))
-
-(setq sentence-end-double-space t)
-
-(use-package org-ref)
 
 (require 'cl-lib)
 (setq bibtex-autokey-before-presentation-function
@@ -510,7 +649,7 @@ shown already, it is deleted instead."
 
 (use-package org-roam
   :config
-  (setq org-roam-directory (file-truename "~/Documents/org-roam"))
+  (setq org-roam-directory (file-truename "~/documents/org-roam"))
   (org-roam-db-autosync-mode)
 
   ;; Overwrite default capture template
@@ -523,7 +662,7 @@ shown already, it is deleted instead."
 
 (defun org-agenda-refresh ()
   (interactive)
-  (setq org-agenda-files (directory-files-recursively "~/Documents/org-roam/" "\\.org$")))
+  (setq org-agenda-files (directory-files-recursively "~/documents/org-roam/" "\\.org$")))
 (org-agenda-refresh)
 
 (setq org-deadline-warning-days 14)

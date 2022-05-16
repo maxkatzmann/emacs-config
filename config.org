@@ -1248,7 +1248,7 @@ logging of state changes, e.g., when a TODO is changed to DONE.)
 #+begin_src emacs-lisp
 (use-package org-roam
   :config
-  (setq org-roam-directory (file-truename "~/Documents/org-roam"))
+  (setq org-roam-directory (file-truename "~/documents/org-roam"))
   (org-roam-db-autosync-mode)
 
   ;; Overwrite default capture template
@@ -1269,7 +1269,7 @@ our org-roam directory.
 #+begin_src emacs-lisp
 (defun org-agenda-refresh ()
   (interactive)
-  (setq org-agenda-files (directory-files-recursively "~/Documents/org-roam/" "\\.org$")))
+  (setq org-agenda-files (directory-files-recursively "~/documents/org-roam/" "\\.org$")))
 (org-agenda-refresh)
 
 #+end_src
