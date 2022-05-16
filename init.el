@@ -87,29 +87,9 @@ shown already, it is deleted instead."
 (require 'nano)
 (require 'nano-theme-light)
 (require 'nano-theme-dark)
-(require 'nano-faces)
 
-(set-face-attribute 'default nil
-                  :family "Roboto Mono"
-                  :weight 'light
-                  :height 140)
-
-(set-face-attribute 'bold nil
-                    :family "Roboto Mono"
-                    :weight 'regular)
-
-(set-face-attribute 'italic nil
-                    :family "Victor Mono"
-                    :weight 'semilight
-                    :slant 'italic)
-
-(set-fontset-font t 'unicode
-                    (font-spec :name "Inconsolata Light"
-                               :size 16) nil)
-
-(set-fontset-font t '(#xe000 . #xffdd)
-                     (font-spec :name "RobotoMono Nerd Font"
-                                :size 12) nil)
+(setq nano-font-family-monospaced "Roboto Mono")
+(setq nano-font-family-proportional "Roboto")
 
 (setq font-lock-maximum-decoration t)
 (setq font-lock-maximum-size 256000)
@@ -776,6 +756,10 @@ shown already, it is deleted instead."
   "hf" 'helpful-function
   "ht" 'helpful-at-point
 )
+
+(leader-set-keys
+  "K" '(:ignore t :wk "macros")
+  "K" 'kmacro-call-macro)
 
 (leader-set-keys
   "o" '(:ignore t :wk "org-roam")

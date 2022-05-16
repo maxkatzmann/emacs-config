@@ -1535,6 +1535,13 @@ Allows us to use SPC for all kinds of actions, just like spacemacs.
 
 #+end_src
 
+*** Macros
+#+begin_src emacs-lisp
+(leader-set-keys
+  "K" '(:ignore t :wk "macros")
+  "K" 'kmacro-call-macro)
+#+end_src
+
 *** Org
 
 #+begin_src emacs-lisp
