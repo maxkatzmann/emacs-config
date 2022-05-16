@@ -364,12 +364,21 @@ shown already, it is deleted instead."
 
 (use-package company
   :after lsp-mode
-  :hook (lsp-mode . company-mode))
+  :hook (lsp-mode . (lambda ()
+           (setq company-backend 'company-lsp)
+           (company-mode))))
 
 (use-package smartparens
   :config
   (sp-pair "$" "$")
   (smartparens-global-mode t))
+
+(setq-default ispell-program-name "aspell")
+
+(use-package flyspell-correct
+  :after flyspell)
+(use-package flyspell-popup
+  :after flyspell-correct)
 
 (dolist (hook '(text-mode-hook))
       (add-hook hook (lambda () (flyspell-mode 1))))
@@ -427,7 +436,9 @@ shown already, it is deleted instead."
         insert-directory-program "/usr/local/bin/gls"
         dired-listing-switches "-agBhlo --group-directories-first"))
 
-(use-package dirvish)
+(use-package dirvish
+  :config
+  (dirvish-override-dired-mode 1))
 
 (straight-use-package
   '(openwith :type git :host github :repo "garberw/openwith"))
@@ -469,6 +480,28 @@ shown already, it is deleted instead."
 (use-package prettier-js
   :after js2-mode
   :hook (js2-mode . prettier-js-mode))
+
+(straight-use-package 'auctex)
+(use-package ivy-bibtex)
+
+(setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin/"))
+(setq exec-path (append exec-path '("/Library/TeX/texbin/")))
+
+(setq TeX-error-overview-open-after-TeX-run t)
+
+(setq TeX-source-correlate-mode t)
+(setq TeX-source-correlate-start-server t)
+(setq TeX-source-correlate-method 'synctex)
+
+(use-package pdf-tools)
+
+(add-hook 'TeX-mode-hook (lambda ()
+                           (lsp-ui-doc-mode -1)
+                           (setq fill-column 70)))
+
+(setq sentence-end-double-space t)
+
+(use-package org-ref)
 
 (require 'cl-lib)
 (setq bibtex-autokey-before-presentation-function
@@ -556,8 +589,12 @@ shown already, it is deleted instead."
 (straight-use-package 'lsp-ui)
 (straight-use-package 'lsp-ivy)
 
+(use-package yasnippet
+  :after lsp-mode)
+
 (setq lsp-headerline-breadcrumb-enable nil)
 (setq lsp-ui-doc-show-with-mouse nil)
+(setq lsp-enable-completion-at-point nil) ;; To fix a bug where multiple completion systems get triggered.
 
 (add-hook 'TeX-mode-hook #'lsp)
 (add-hook 'ess-r-mode-hook #'lsp)
@@ -880,10 +917,6 @@ shown already, it is deleted instead."
   "ht" 'helpful-at-point
 )
 
-(add-hook 'lsp-mode-hook (lambda ()
-                           (leader-set-keys
-                             "mj" 'lsp-ivy-workspace-symbol)))
-
 (leader-set-keys
   "o" '(:ignore t :wk "org-roam")
   "oa" '(:ignore t :wk "agenda")
@@ -941,8 +974,9 @@ shown already, it is deleted instead."
 (leader-set-keys
   "S" '(:ignore t :wk "Spelling")
   "Sb" 'flyspell-buffer
-  "Sc" 'flyspell-auto-correct-word
+  "Sc" 'flyspell-correct-wrapper
   "Sn" 'flyspell-goto-next-error
+  "Sn" 'ispell-change-dictionary
 )
 
 (defhydra hydra-transient-special-characters (:timeout 4)
@@ -979,6 +1013,10 @@ shown already, it is deleted instead."
 (leader-set-keys-for-major-mode 'latex-mode "xi" 'latex/font-italic)
 (leader-set-keys-for-major-mode 'latex-mode "xc" 'latex/font-code)
 (leader-set-keys-for-major-mode 'latex-mode "xs" 'latex/font-small-caps)
+
+(add-hook 'TeX-mode-hook (lambda ()
+                           (leader-set-keys
+                             "mj" 'lsp-ivy-workspace-symbol)))
 
 (leader-set-keys
   "x" '(:ignore t :wk "text")
@@ -1018,6 +1056,7 @@ shown already, it is deleted instead."
 (leader-set-keys
   "w" '(:ignore t :wk "window")
   "wd" 'delete-window
+  "wD" 'delete-other-windows
   "wv" 'split-and-follow-vertically
   "ws" 'split-and-follow-horizontally
   "wl" 'evil-window-right
