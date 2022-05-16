@@ -13,7 +13,10 @@
 
 (straight-use-package 'use-package)
 (use-package straight
-             :custom (straight-use-package-by-default t))
+               :custom (straight-use-package-by-default t))
+
+(require 'use-package-ensure)
+(setq use-package-always-ensure t)
 
 (straight-use-package 'org)
 
@@ -214,6 +217,7 @@ shown already, it is deleted instead."
       ?\M-`
       ?\M-&
       ?\M-:
+      ?\M-w
       ?\C-\M-j  ;; Buffer list
       ?\C-\ ))  ;; Ctrl+Space
 
@@ -239,7 +243,7 @@ shown already, it is deleted instead."
                        (start-process-shell-command command nil command)))
 
           ;; Switch workspace
-          ([?\s-w] . exwm-workspace-switch)
+          ([?\s-w] . hydra-transient-exwm-window-management/body)
           ([?\s-`] . (lambda () (interactive) (exwm-workspace-switch-create 0)))
 
           ;; s-Shift-N to move a window to a workspace
@@ -1071,6 +1075,44 @@ shown already, it is deleted instead."
   "wr" 'hydra-transient-window-resize/body
   "ww" 'writeroom-mode
 )
+
+(defhydra hydra-transient-exwm-window-management (:timeout 4
+                                                  :hint nil)
+  "
+  ^Focus^       ^Move^        ^Split^             ^Delete^             ^Other
+  ^^^^^^^^-------------------------------------------------------------------------
+  _h_: left     _H_: Left     _v_ vertically      _d_ delete window    _r_ resize
+  _l_: right    _L_: Right    _s_ horizontally    _D_ delete other     _m_ move
+  _k_: up       _K_: Up       _t_ terminal
+  _j_: down     _J_: Down
+  "
+    ("v" split-and-follow-vertically nil :exit t)
+    ("s" split-and-follow-horizontally nil :exit t)
+    ("l" evil-window-right :exit t)
+    ("h" evil-window-left :exit t)
+    ("j" evil-window-down :exit t)
+    ("k" evil-window-up :exit t)
+    ("L" evil-window-move-far-right :exit t)
+    ("H" evil-window-move-far-left :exit t)
+    ("J" evil-window-move-far-down :exit t)
+    ("K" evil-window-move-far-up :exit t)
+    ("d" delete-window :exit t)
+    ("D" delete-other-windows :exit t)
+    ("t" mk/split-to-shell :exit t)
+    ("m" hydra-transient-exwm-window-move/body :exit t)
+    ("r" hydra-transient-window-resize/body :exit t))
+
+  (defhydra hydra-transient-exwm-window-move (:timeout 4)
+    "Move window"
+    ("1" (exwm-workspace-move-window 1) "1" :exit t)
+    ("2" (exwm-workspace-move-window 2) "2" :exit t)
+    ("3" (exwm-workspace-move-window 3) "3" :exit t)
+    ("4" (exwm-workspace-move-window 4) "4" :exit t)
+    ("5" (exwm-workspace-move-window 5) "5" :exit t)
+    ("6" (exwm-workspace-move-window 6) "6" :exit t)
+    ("7" (exwm-workspace-move-window 7) "7" :exit t)
+    ("8" (exwm-workspace-move-window 8) "8" :exit t)
+    ("9" (exwm-workspace-move-window 9) "9" :exit t))
 
 (leader-set-keys
   "z" '(:ignore t :wk "zoom")
