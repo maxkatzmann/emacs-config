@@ -39,6 +39,12 @@ We need this to fix an issue with `org-file-name-concat` having a void function 
 
 * General
 
+Server
+
+#+begin_src emacs-lisp
+(server-start)
+#+end_src
+
 We do not want the contents of the clipboard to be overwritten when
 pasting something in visual mode.
 
@@ -183,6 +189,7 @@ Set the default font for everything
 #+begin_src emacs-lisp
 (setq nano-font-family-monospaced "Roboto Mono")
 (setq nano-font-family-proportional "Roboto")
+(setq nano-font-size 10)
 
 #+end_src
 
