@@ -447,7 +447,9 @@ By specifying `:tangle no` on this block, we disable it.
 #+begin_src emacs-lisp
 (use-package company
   :after lsp-mode
-  :hook (lsp-mode . company-mode))
+  :hook (lsp-mode . (lambda ()
+           (setq company-backend 'company-lsp)
+           (company-mode))))
 
 #+end_src
 
@@ -462,6 +464,22 @@ By specifying `:tangle no` on this block, we disable it.
 #+end_src
 
 ** Spelling
+
+The default spell checker should be aspell.
+
+#+begin_src emacs-lisp
+(setq-default ispell-program-name "aspell")
+#+end_src
+
+Use popups to correct spelling mistakes.
+
+#+begin_src emacs-lisp
+(use-package flyspell-correct
+  :after flyspell)
+(use-package flyspell-popup
+  :after flyspell-correct)
+
+#+end_src
 
 #+begin_src emacs-lisp
 (dolist (hook '(text-mode-hook))
@@ -583,7 +601,9 @@ Improve how dired buffers are displayed.
 Use dirvish as dired alternative.
 
 #+begin_src emacs-lisp
-(use-package dirvish)
+(use-package dirvish
+  :config
+  (dirvish-override-dired-mode 1))
 #+end_src
 
 Configure that certain files are opened externally.
@@ -878,11 +898,18 @@ Functions to change latex font environments (bold, emphasis, etc.)
 
 #+end_src
 
+LSP requies YASnippet
+#+begin_src emacs-lisp
+(use-package yasnippet
+  :after lsp-mode)
+#+end_src
+
 We don't want breadcrumbs and no tips on mouse over.
 
 #+begin_src emacs-lisp
 (setq lsp-headerline-breadcrumb-enable nil)
 (setq lsp-ui-doc-show-with-mouse nil)
+(setq lsp-enable-completion-at-point nil) ;; To fix a bug where multiple completion systems get triggered.
 
 #+end_src
 
@@ -941,7 +968,6 @@ Preview
                               (yapf-mode)))
 
 (setq lsp-enable-file-watchers nil)
-
 #+end_src
 
 ** R
@@ -1509,18 +1535,6 @@ Allows us to use SPC for all kinds of actions, just like spacemacs.
 
 #+end_src
 
-*** LSP
-
-Depending on which mode we are in, we want to use different functions
-for jumping.
-
-#+begin_src emacs-lisp
-(add-hook 'lsp-mode-hook (lambda ()
-                           (leader-set-keys
-                             "mj" 'lsp-ivy-workspace-symbol)))
-
-#+end_src
-
 *** Org
 
 #+begin_src emacs-lisp
@@ -1609,8 +1623,9 @@ Correct spelling.
 (leader-set-keys
   "S" '(:ignore t :wk "Spelling")
   "Sb" 'flyspell-buffer
-  "Sc" 'flyspell-auto-correct-word
+  "Sc" 'flyspell-correct-wrapper
   "Sn" 'flyspell-goto-next-error
+  "Sn" 'ispell-change-dictionary
 )
 
 #+end_src
@@ -1663,6 +1678,9 @@ Transient state for inserting Special characters. (äÄüÜöÖß)
 (leader-set-keys-for-major-mode 'latex-mode "xc" 'latex/font-code)
 (leader-set-keys-for-major-mode 'latex-mode "xs" 'latex/font-small-caps)
 
+(add-hook 'TeX-mode-hook (lambda ()
+                           (leader-set-keys
+                             "mj" 'lsp-ivy-workspace-symbol)))
 #+end_src
 
 *** Text
@@ -1726,6 +1744,7 @@ Transient state for inserting Special characters. (äÄüÜöÖß)
 (leader-set-keys
   "w" '(:ignore t :wk "window")
   "wd" 'delete-window
+  "wD" 'delete-other-windows
   "wv" 'split-and-follow-vertically
   "ws" 'split-and-follow-horizontally
   "wl" 'evil-window-right
