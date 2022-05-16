@@ -187,11 +187,8 @@ ramp-coreload-6 = ▇
 type = internal/date
 interval = 5
 
-date = "%a %b %e"
-date-alt = "%A %B %d %Y"
-
-time = %l:%M %p
-time-alt = %H:%M:%S
+date = "%A %d.%m."
+time = %H:%M:%S
 
 format-prefix-foreground = ${colors.foreground-alt}
 format-underline = ${colors.underline-1}
