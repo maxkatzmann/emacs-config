@@ -1083,8 +1083,8 @@ shown already, it is deleted instead."
   ^^^^^^^^-------------------------------------------------------------------------
   _h_: left     _H_: Left     _v_ vertically      _d_ delete window    _r_ resize
   _l_: right    _L_: Right    _s_ horizontally    _D_ delete other     _m_ move
-  _k_: up       _K_: Up       _t_ terminal        _k_ kill
-  _j_: down     _J_: Down                         _q_ kill
+  _k_: up       _K_: Up       _t_ terminal        _q_ kill
+  _j_: down     _J_: Down
   "
     ("v" split-and-follow-vertically nil :exit t)
     ("s" split-and-follow-horizontally nil :exit t)
@@ -1098,7 +1098,6 @@ shown already, it is deleted instead."
     ("K" evil-window-move-far-up :exit t)
     ("d" delete-window :exit t)
     ("D" delete-other-windows :exit t)
-    ("k" kill-this-buffer :exit t)
     ("q" kill-this-buffer :exit t)
     ("t" mk/split-to-shell :exit t)
     ("m" hydra-transient-exwm-window-move/body :exit t)
