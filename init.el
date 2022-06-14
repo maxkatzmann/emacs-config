@@ -82,14 +82,29 @@ shown already, it is deleted instead."
            (shell))
          (switch-to-buffer "*shell*")))))
 
+(defun mk/reload-modus-config ()
+  (setq modus-themes-region '(bg-only))
+  (setq modus-themes-bold-constructs t)
+  (setq modus-themes-italic-constructs t)
+  (setq modus-themes-syntax '(faint))
+  (setq modus-themes-headings
+    '((1 . (overline background 1.3))
+      (2 . (background 1.2))
+      (3 . (bold 1.1))
+      (t . (1.05))))
+  (setq modus-themes-scale-headings t)
+  (setq modus-themes-org-blocks 'tinted-background)
+  (load-theme 'modus-operandi t))
+
 (use-package modus-themes
-  :init (load-theme 'modus-operandi t))
+  :init (mk/reload-modus-config)
+  :hook (org-mode . mk/reload-modus-config))
 
 (set-face-attribute 'default nil
-      :family "Roboto Mono"
-    :height 150
+  :family "Roboto Mono"
+  :height 150
   :weight 'medium
-:width 'normal)
+  :width 'normal)
 
 (setq default-frame-alist
       (append (list
@@ -887,6 +902,16 @@ shown already, it is deleted instead."
   "xa" 'accent-menu
   "xi" 'hydra-transient-special-characters/body
 )
+
+(defun mk/theme-toggle ()
+  (interactive)
+  (modus-themes-toggle)
+  ;; Can be used to ensure that the fringe has the same color
+  ;; as the gutter.  However, leads to artifacts near the echo
+  ;; area.
+  (set-face-attribute 'fringe nil
+     :background (face-background 'org-block-begin-line)
+     :foreground (face-foreground 'modus-themes-hl-line)))
 
 (leader-set-keys
   "T" '(:ignore t :wk "Theme")

@@ -167,9 +167,28 @@ shown already, it is deleted instead."
 * Theme
 ** Modus
 
+Somehow, setting the org-heading sizes initially does not work, so we
+add reload the config whenever we enter org-mode.
+
 #+begin_src emacs-lisp
+(defun mk/reload-modus-config ()
+  (setq modus-themes-region '(bg-only))
+  (setq modus-themes-bold-constructs t)
+  (setq modus-themes-italic-constructs t)
+  (setq modus-themes-syntax '(faint))
+  (setq modus-themes-headings
+    '((1 . (overline background 1.3))
+      (2 . (background 1.2))
+      (3 . (bold 1.1))
+      (t . (1.05))))
+  (setq modus-themes-scale-headings t)
+  (setq modus-themes-org-blocks 'tinted-background)
+  (load-theme 'modus-operandi t))
+
 (use-package modus-themes
-  :init (load-theme 'modus-operandi t))
+  :init (mk/reload-modus-config)
+  :hook (org-mode . mk/reload-modus-config))
+
 #+end_src
 
 ** Fonts
@@ -177,10 +196,10 @@ shown already, it is deleted instead."
 Set the default font for everything
 
 #+begin_src emacs-lisp
-        (set-face-attribute 'default nil
-        :family "Roboto Mono"
-      :height 150
-    :weight 'medium
+(set-face-attribute 'default nil
+  :family "Roboto Mono"
+  :height 150
+  :weight 'medium
   :width 'normal)
 #+end_src
 
@@ -1727,6 +1746,16 @@ Transient state for inserting Special characters. (äÄüÜöÖß)
 *** Theme
 
 #+begin_src emacs-lisp
+(defun mk/theme-toggle ()
+  (interactive)
+  (modus-themes-toggle)
+  ;; Can be used to ensure that the fringe has the same color
+  ;; as the gutter.  However, leads to artifacts near the echo
+  ;; area.
+  (set-face-attribute 'fringe nil
+     :background (face-background 'org-block-begin-line)
+     :foreground (face-foreground 'modus-themes-hl-line)))
+
 (leader-set-keys
   "T" '(:ignore t :wk "Theme")
   "Ts" 'modus-themes-toggle
