@@ -890,7 +890,7 @@ shown already, it is deleted instead."
 
 (leader-set-keys
   "T" '(:ignore t :wk "Theme")
-  "Ts" 'nano-toggle-theme
+  "Ts" 'modus-themes-toggle
 )
 
 (leader-set-keys

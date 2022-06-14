@@ -1729,7 +1729,7 @@ Transient state for inserting Special characters. (äÄüÜöÖß)
 #+begin_src emacs-lisp
 (leader-set-keys
   "T" '(:ignore t :wk "Theme")
-  "Ts" 'nano-toggle-theme
+  "Ts" 'modus-themes-toggle
 )
 
 #+end_src
