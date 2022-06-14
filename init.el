@@ -82,28 +82,25 @@ shown already, it is deleted instead."
            (shell))
          (switch-to-buffer "*shell*")))))
 
-(straight-use-package
-  '(nano-emacs :type git :host github :repo "rougier/nano-emacs"))
-(require 'nano)
-(require 'nano-theme-light)
-(require 'nano-theme-dark)
+(use-package modus-themes
+  :init (load-theme 'modus-operandi t))
 
-(setq nano-font-family-monospaced "Roboto Mono")
-(setq nano-font-family-proportional "Roboto")
-
-(setq font-lock-maximum-decoration t)
-(setq font-lock-maximum-size 256000)
+(set-face-attribute 'default nil
+      :family "Roboto Mono"
+    :height 150
+  :weight 'medium
+:width 'normal)
 
 (setq default-frame-alist
       (append (list
-	           '(min-height . 1)
+                   '(min-height . 1)
                '(height     . 45)
-	           '(min-width  . 1)
+                   '(min-width  . 1)
                '(width      . 81)
                '(vertical-scroll-bars . nil)
                '(internal-border-width . 24)
-               '(left-fringe    . 8)
-               '(right-fringe   . 8)
+               '(left-fringe    . 5)
+               '(right-fringe   . 5)
                '(tool-bar-lines . 0)
                '(menu-bar-lines . 0))))
 
@@ -143,11 +140,29 @@ shown already, it is deleted instead."
                  (font-height-org-mode-hook)))
           (t nil)))
 
-(nano-theme-set-light)
-(nano-refresh-theme)
+;; (nano-theme-set-light)
+;; (nano-refresh-theme)
 
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
+
+(use-package nano-modeline
+  :config
+  (set-face-attribute 'nano-modeline-active-status-RW nil
+                    :background "#D7D7D7"
+                    :foreground "black"
+                    :overline nil
+                    :underline nil)
+  (set-face-attribute 'nano-modeline-active-status-** nil
+                    :background "#831D71"
+                    :foreground "white"
+                    :overline nil
+                    :underline nil)
+  :init
+  (nano-modeline-mode))
+
+(use-package hide-mode-line
+  :init (global-hide-mode-line-mode +1))
 
 (global-display-line-numbers-mode t)
 (setq display-line-numbers-type 'relative)

@@ -165,15 +165,11 @@ shown already, it is deleted instead."
 #+end_src
 
 * Theme
-** Nano
+** Modus
 
 #+begin_src emacs-lisp
-(straight-use-package
-  '(nano-emacs :type git :host github :repo "rougier/nano-emacs"))
-(require 'nano)
-(require 'nano-theme-light)
-(require 'nano-theme-dark)
-
+(use-package modus-themes
+  :init (load-theme 'modus-operandi t))
 #+end_src
 
 ** Fonts
@@ -181,18 +177,11 @@ shown already, it is deleted instead."
 Set the default font for everything
 
 #+begin_src emacs-lisp
-(setq nano-font-family-monospaced "Roboto Mono")
-(setq nano-font-family-proportional "Roboto")
-
-#+end_src
-
-Nano disables font-look by default, which we re-enable because its so
-nice.
-
-#+begin_src emacs-lisp
-(setq font-lock-maximum-decoration t)
-(setq font-lock-maximum-size 256000)
-
+        (set-face-attribute 'default nil
+        :family "Roboto Mono"
+      :height 150
+    :weight 'medium
+  :width 'normal)
 #+end_src
 
 ** Fringe
@@ -200,62 +189,62 @@ nice.
 Nano disables the fringe.  We want it back.
 
 #+begin_src emacs-lisp
-(setq default-frame-alist
-      (append (list
-	           '(min-height . 1)
-               '(height     . 45)
-	           '(min-width  . 1)
-               '(width      . 81)
-               '(vertical-scroll-bars . nil)
-               '(internal-border-width . 24)
-               '(left-fringe    . 8)
-               '(right-fringe   . 8)
-               '(tool-bar-lines . 0)
-               '(menu-bar-lines . 0))))
+  (setq default-frame-alist
+        (append (list
+                     '(min-height . 1)
+                 '(height     . 45)
+                     '(min-width  . 1)
+                 '(width      . 81)
+                 '(vertical-scroll-bars . nil)
+                 '(internal-border-width . 24)
+                 '(left-fringe    . 5)
+                 '(right-fringe   . 5)
+                 '(tool-bar-lines . 0)
+                 '(menu-bar-lines . 0))))
 
 #+end_src
 
 ** Dark/Light Switching
 
 #+begin_src emacs-lisp
-(defun nano-refresh-theme ()
-   "Convenience function which refreshes the nano-theme.
- Calls \(nano-faces\) and \(nano-theme\) sequentially."
-   (interactive)
-   (progn
-     (nano-faces)
-     (nano-theme)))
+  (defun nano-refresh-theme ()
+     "Convenience function which refreshes the nano-theme.
+   Calls \(nano-faces\) and \(nano-theme\) sequentially."
+     (interactive)
+     (progn
+       (nano-faces)
+       (nano-theme)))
 
- (defcustom nano-theme-var "light"
-   "Variable which sets the default startup theme as light or dark.
- Also allows for toggling of the themes. Is set to 'light' by
- 'nano-theme-light' and 'dark' by 'nano-theme-dark'.
- Defaults to nil."
-   :group 'nano
-   :type 'string)
+   (defcustom nano-theme-var "light"
+     "Variable which sets the default startup theme as light or dark.
+   Also allows for toggling of the themes. Is set to 'light' by
+   'nano-theme-light' and 'dark' by 'nano-theme-dark'.
+   Defaults to nil."
+     :group 'nano
+     :type 'string)
 
- (defun nano-toggle-theme ()
-   "Function to interactively toggle between light and dark nano themes.
- Requires both to be loaded in order to work."
-   (interactive)
-   (cond ((string= nano-theme-var "light")
-          (progn (nano-theme-set-dark)
-                 (nano-refresh-theme)
-                 (setq nano-theme-var "dark")
-                 ;; Make sure org font sizes are updated after refreshing the
-                 ;; theme.
-                 (font-height-org-mode-hook)))
-          ((string= nano-theme-var "dark")
-          (progn (nano-theme-set-light)
-                 (nano-refresh-theme)
-                 (setq nano-theme-var "light")
-                 ;; Make sure org font sizes are updated after refreshing the
-                 ;; theme.
-                 (font-height-org-mode-hook)))
-          (t nil)))
+   (defun nano-toggle-theme ()
+     "Function to interactively toggle between light and dark nano themes.
+   Requires both to be loaded in order to work."
+     (interactive)
+     (cond ((string= nano-theme-var "light")
+            (progn (nano-theme-set-dark)
+                   (nano-refresh-theme)
+                   (setq nano-theme-var "dark")
+                   ;; Make sure org font sizes are updated after refreshing the
+                   ;; theme.
+                   (font-height-org-mode-hook)))
+            ((string= nano-theme-var "dark")
+            (progn (nano-theme-set-light)
+                   (nano-refresh-theme)
+                   (setq nano-theme-var "light")
+                   ;; Make sure org font sizes are updated after refreshing the
+                   ;; theme.
+                   (font-height-org-mode-hook)))
+            (t nil)))
 
-(nano-theme-set-light)
-(nano-refresh-theme)
+  ;; (nano-theme-set-light)
+  ;; (nano-refresh-theme)
 
 #+end_src
 
@@ -267,6 +256,34 @@ Nano disables the fringe.  We want it back.
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 
+#+end_src
+
+** Modeline
+
+Use nano-modeline which is at the top.
+
+#+begin_src emacs-lisp
+(use-package nano-modeline
+  :config
+  (set-face-attribute 'nano-modeline-active-status-RW nil
+                    :background "#D7D7D7"
+                    :foreground "black"
+                    :overline nil
+                    :underline nil)
+  (set-face-attribute 'nano-modeline-active-status-** nil
+                    :background "#831D71"
+                    :foreground "white"
+                    :overline nil
+                    :underline nil)
+  :init
+  (nano-modeline-mode))
+#+end_src
+
+Hide the default modeline.
+
+#+begin_src emacs-lisp
+  (use-package hide-mode-line
+    :init (global-hide-mode-line-mode +1))
 #+end_src
 
 ** Lines
@@ -619,7 +636,6 @@ Configure that certain files are opened externally.
 (openwith-mode 1)
 #+end_src
 
-
 * Programming
 ** Bazel
 
@@ -960,6 +976,7 @@ Preview
 (use-package yapfify)
 
 (add-hook 'python-mode-hook (lambda ()
+                              (define-key python-mode-map (kbd "<backspace>") nil) ;; fixes an issue where backspace would not work in python mode
                               (setq lsp-headerline-breadcrumb-enable nil)
                               (setq lsp-ui-doc-mode -1)
                               (require 'importmagic)
