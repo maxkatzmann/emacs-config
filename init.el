@@ -617,9 +617,9 @@ shown already, it is deleted instead."
 
 (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
 
-(use-package org-notifications
-  :config
-  (org-notifications-start))
+;; (use-package org-notifications
+;;   :config
+;;   (org-notifications-start))
 
 (setq mac-option-modifier 'alt)
 (global-set-key (kbd "A-<backspace>") 'backward-kill-word)

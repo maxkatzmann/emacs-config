@@ -1261,12 +1261,13 @@ Increase the font-size of latex previews.
 
 ** Notifications
 
-TODO: This is not working yet.
+TODO: This is not working yet.  Also, when enabled, leads to freezes
+and random popups of the agenda buffer.
 
 #+begin_src emacs-lisp
-(use-package org-notifications
-  :config
-  (org-notifications-start))
+  ;; (use-package org-notifications
+  ;;   :config
+  ;;   (org-notifications-start))
 
 #+end_src
 
