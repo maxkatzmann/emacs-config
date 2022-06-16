@@ -850,7 +850,7 @@ shown already, it is deleted instead."
   "Sb" 'flyspell-buffer
   "Sc" 'flyspell-correct-wrapper
   "Sn" 'flyspell-goto-next-error
-  "Sn" 'ispell-change-dictionary
+  "Sd" 'ispell-change-dictionary
 )
 
 (defhydra hydra-transient-special-characters (:timeout 4)

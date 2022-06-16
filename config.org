@@ -1308,7 +1308,6 @@ and random popups of the agenda buffer.
 #+end_src
 
 * Keybindings
-
 ** General
 
 We want to use Alt/Option-Backspace to delete words.
@@ -1669,7 +1668,7 @@ Correct spelling.
   "Sb" 'flyspell-buffer
   "Sc" 'flyspell-correct-wrapper
   "Sn" 'flyspell-goto-next-error
-  "Sn" 'ispell-change-dictionary
+  "Sd" 'ispell-change-dictionary
 )
 
 #+end_src
