@@ -39,6 +39,11 @@
 
 (use-package helpful)
 
+(setq even-window-sizes nil)
+
+(setq display-buffer-base-action
+  '(display-buffer-same-window))
+
 (use-package cycle-resize
   :config
   (setq cycle-resize-steps '(75 50 25 50)))

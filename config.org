@@ -103,6 +103,17 @@ the center.
 
 ** Windowing
 
+Don't resize windows upon popup
+#+begin_src emacs-lisp
+(setq even-window-sizes nil)
+#+end_src
+
+How to display windows.
+#+begin_src emacs-lisp
+(setq display-buffer-base-action
+  '(display-buffer-same-window))
+#+end_src
+
 #+begin_src emacs-lisp
 (use-package cycle-resize
   :config
