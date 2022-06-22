@@ -67,20 +67,25 @@
   (other-window 1))
 
 (defun mk/split-to-shell ()
-   "If no *shell* buffer exists, one is created using the `shell` function
-and it is displayed in a new window at the ver bottom. If such a window is
-shown already, it is deleted instead."
-   (interactive)
-   (let ((shell-window (get-buffer-window "*shell*")))
-     (if shell-window
+  "If no *shell* buffer exists, one is created using the `shell` function
+  and it is displayed in a new window at the ver bottom. If such a window is
+  shown already, it is deleted instead."
+  (interactive)
+  (let ((shell-window (get-buffer-window "*shell*")))
+    (if shell-window
+       (progn
+         (delete-window shell-window))
         (progn
-          (delete-window shell-window))
-         (progn
-         (split-and-follow-horizontally)
-         (evil-window-move-very-bottom)
-         (unless (get-buffer "*shell*")
-           (shell))
-         (switch-to-buffer "*shell*")))))
+        (split-and-follow-horizontally)
+        (evil-window-move-very-bottom)
+        (unless (get-buffer "*shell*")
+          (shell))
+        (switch-to-buffer "*shell*")))))
+
+(defun mk/split-to-shell-fullscreen ()
+  (interactive)
+  (mk/split-to-shell)
+  (delete-other-windows))
 
 (use-package doom-themes
   :ensure t
@@ -965,6 +970,7 @@ shown already, it is deleted instead."
   "wk" 'evil-window-up
   "wK" 'evil-window-move-very-top
   "wt" 'mk/split-to-shell
+  "wT" 'mk/split-to-shell-fullscreen
   "wr" 'hydra-transient-window-resize/body
   "ww" 'writeroom-mode
 )
