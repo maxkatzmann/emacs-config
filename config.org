@@ -170,7 +170,7 @@ shown already, it is deleted instead."
 Somehow, setting the org-heading sizes initially does not work, so we
 add reload the config whenever we enter org-mode.
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (defun mk/reload-modus-config ()
   (setq modus-themes-region '(bg-only))
   (setq modus-themes-bold-constructs t)
@@ -189,6 +189,31 @@ add reload the config whenever we enter org-mode.
   :init (mk/reload-modus-config)
   :hook (org-mode . mk/reload-modus-config))
 
+#+end_src
+
+
+** Solaire Mode
+
+Load Solaire before loading the theme, so that Solaire is actually
+enabled.
+
+#+begin_src emacs-lisp :tangle no
+(use-package solaire-mode
+  :init (solaire-global-mode +1))
+#+end_src
+
+** Doom
+#+begin_src emacs-lisp
+(use-package doom-themes
+  :ensure t
+  :config
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+        doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  (load-theme 'doom-tomorrow-day t)
+
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
 #+end_src
 
 ** Fonts
@@ -282,20 +307,20 @@ Nano disables the fringe.  We want it back.
 Use nano-modeline which is at the top.
 
 #+begin_src emacs-lisp
-(use-package nano-modeline
-  :config
-  (set-face-attribute 'nano-modeline-active-status-RW nil
-                    :background "#D7D7D7"
-                    :foreground "black"
-                    :overline nil
-                    :underline nil)
-  (set-face-attribute 'nano-modeline-active-status-** nil
-                    :background "#831D71"
-                    :foreground "white"
-                    :overline nil
-                    :underline nil)
-  :init
-  (nano-modeline-mode))
+  (use-package nano-modeline
+    :init
+    (nano-modeline-mode)
+    ;; (set-face-attribute 'nano-modeline-active-status-RW nil
+    ;;                 :background "#D7D7D7"
+    ;;                 :foreground "black"
+    ;;                 :overline nil
+    ;;                 :underline nil)
+    ;;  (set-face-attribute 'nano-modeline-active-status-** nil
+    ;;                 :background "#831D71"
+    ;;                 :foreground "white"
+    ;;                 :overline nil
+    ;;                 :underline nil)
+  )
 #+end_src
 
 Hide the default modeline.
@@ -730,6 +755,14 @@ Support for formatting of JavaScript code
 
 #+end_src
 
+** Jupyter
+
+#+begin_src emacs-lisp
+(use-package ein
+  :init
+  (setq ein:output-area-inlined-images t))
+#+end_src
+
 ** LaTeX
 
 Somehow setting up auctex with use-package did not work, so we do it
@@ -1076,6 +1109,7 @@ type "<el" and hit TAB)
 (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 (add-to-list 'org-structure-template-alist '("py" . "src python"))
 (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+(add-to-list 'org-structure-template-alist '("ein" . "src ein-python :session localhost"))
 
 #+end_src
 
@@ -1214,10 +1248,17 @@ specify for which languages we want to have this enabled.
 
 #+begin_src emacs-lisp
 (org-babel-do-load-languages
- 'org-babel-load-languages
- '((emacs-lisp . t)
-   (python . t)))
+  'org-babel-load-languages
+    '((emacs-lisp . t)
+      (python . t)
+      (ein . t)))
 
+#+end_src
+
+Allow code execution in org files.
+
+#+begin_src emacs-lisp
+(setq org-confirm-babel-evaluate nil)
 #+end_src
 
 We want the `config.org` file to be tangled by babel automatically.
@@ -1238,7 +1279,7 @@ A nicer way to display the bullets in org-mode.
 
 #+begin_src emacs-lisp
 (use-package org-bullets
-  :config
+  :init
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
   (setq org-bullets-bullet-list '("▶" "▷" "◉" "○")))
 
@@ -1571,12 +1612,19 @@ Allows us to use SPC for all kinds of actions, just like spacemacs.
 
 #+end_src
 
+
+*** Jupyter
+#+begin_src emacs-lisp
+(leader-set-keys-for-major-mode 'python-mode "c" 'ein:worksheet-execute-cell-km)
+(leader-set-keys-for-major-mode 'python-mode "n" 'ein:worksheet-insert-cell-below)
+#+end_src
 *** Macros
 #+begin_src emacs-lisp
 (leader-set-keys
   "K" '(:ignore t :wk "macros")
   "K" 'kmacro-call-macro)
 #+end_src
+
 
 *** Org
 
@@ -1745,20 +1793,29 @@ Transient state for inserting Special characters. (äÄüÜöÖß)
 *** Theme
 
 #+begin_src emacs-lisp
-(defun mk/theme-toggle ()
-  (interactive)
-  (modus-themes-toggle)
-  ;; Can be used to ensure that the fringe has the same color
-  ;; as the gutter.  However, leads to artifacts near the echo
-  ;; area.
-  (set-face-attribute 'fringe nil
-     :background (face-background 'org-block-begin-line)
-     :foreground (face-foreground 'modus-themes-hl-line)))
+(defcustom doom-theme-var "light"
+   "Variable which sets the default startup theme as light or dark.
+ Also allows for toggling of the themes.
+ Defaults to nil."
+   :group 'doom
+   :type 'string)
 
-(leader-set-keys
-  "T" '(:ignore t :wk "Theme")
-  "Ts" 'modus-themes-toggle
-)
+ (defun mk/doom-toggle-theme ()
+   "Function to interactively toggle between light and dark doom themes.
+ Requires both to be loaded in order to work."
+   (interactive)
+   (cond ((string= doom-theme-var "light")
+          (progn (load-theme 'doom-tomorrow-night t)
+                 (setq doom-theme-var "dark")))
+          ((string= doom-theme-var "dark")
+          (progn (load-theme 'doom-tomorrow-day t)
+                 (setq doom-theme-var "light")))
+          (t nil))) 
+
+  (leader-set-keys
+    "T" '(:ignore t :wk "Theme")
+    "Ts" 'mk/doom-toggle-theme
+  )
 
 #+end_src
 

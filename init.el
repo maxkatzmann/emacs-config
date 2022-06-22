@@ -82,23 +82,16 @@ shown already, it is deleted instead."
            (shell))
          (switch-to-buffer "*shell*")))))
 
-(defun mk/reload-modus-config ()
-  (setq modus-themes-region '(bg-only))
-  (setq modus-themes-bold-constructs t)
-  (setq modus-themes-italic-constructs t)
-  (setq modus-themes-syntax '(faint))
-  (setq modus-themes-headings
-    '((1 . (overline background 1.3))
-      (2 . (background 1.2))
-      (3 . (bold 1.1))
-      (t . (1.05))))
-  (setq modus-themes-scale-headings t)
-  (setq modus-themes-org-blocks 'tinted-background)
-  (load-theme 'modus-operandi t))
+(use-package doom-themes
+  :ensure t
+  :config
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+        doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  (load-theme 'doom-tomorrow-day t)
 
-(use-package modus-themes
-  :init (mk/reload-modus-config)
-  :hook (org-mode . mk/reload-modus-config))
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
 
 (set-face-attribute 'default nil
   :family "Roboto Mono"
@@ -162,19 +155,19 @@ shown already, it is deleted instead."
 (scroll-bar-mode -1)
 
 (use-package nano-modeline
-  :config
-  (set-face-attribute 'nano-modeline-active-status-RW nil
-                    :background "#D7D7D7"
-                    :foreground "black"
-                    :overline nil
-                    :underline nil)
-  (set-face-attribute 'nano-modeline-active-status-** nil
-                    :background "#831D71"
-                    :foreground "white"
-                    :overline nil
-                    :underline nil)
   :init
-  (nano-modeline-mode))
+  (nano-modeline-mode)
+  ;; (set-face-attribute 'nano-modeline-active-status-RW nil
+  ;;                 :background "#D7D7D7"
+  ;;                 :foreground "black"
+  ;;                 :overline nil
+  ;;                 :underline nil)
+  ;;  (set-face-attribute 'nano-modeline-active-status-** nil
+  ;;                 :background "#831D71"
+  ;;                 :foreground "white"
+  ;;                 :overline nil
+  ;;                 :underline nil)
+)
 
 (use-package hide-mode-line
   :init (global-hide-mode-line-mode +1))
@@ -347,6 +340,10 @@ shown already, it is deleted instead."
 (use-package prettier-js
   :after js2-mode
   :hook (js2-mode . prettier-js-mode))
+
+(use-package ein
+  :init
+  (setq ein:output-area-inlined-images t))
 
 (straight-use-package 'auctex)
 (use-package ivy-bibtex)
@@ -533,6 +530,7 @@ shown already, it is deleted instead."
 (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 (add-to-list 'org-structure-template-alist '("py" . "src python"))
 (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+(add-to-list 'org-structure-template-alist '("ein" . "src ein-python :session localhost"))
 
 (defun org-todo-list-LATER ()
   (interactive)
@@ -608,9 +606,12 @@ shown already, it is deleted instead."
 (setq evil-want-C-i-jump nil)
 
 (org-babel-do-load-languages
- 'org-babel-load-languages
- '((emacs-lisp . t)
-   (python . t)))
+  'org-babel-load-languages
+    '((emacs-lisp . t)
+      (python . t)
+      (ein . t)))
+
+(setq org-confirm-babel-evaluate nil)
 
 (defun mk/org-babel-tangle-config ()
   (when (string-equal (buffer-file-name)
@@ -620,7 +621,7 @@ shown already, it is deleted instead."
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'mk/org-babel-tangle-config)))
 
 (use-package org-bullets
-  :config
+  :init
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
   (setq org-bullets-bullet-list '("▶" "▷" "◉" "○")))
 
@@ -787,6 +788,9 @@ shown already, it is deleted instead."
   "ht" 'helpful-at-point
 )
 
+(leader-set-keys-for-major-mode 'python-mode "c" 'ein:worksheet-execute-cell-km)
+(leader-set-keys-for-major-mode 'python-mode "n" 'ein:worksheet-insert-cell-below)
+
 (leader-set-keys
   "K" '(:ignore t :wk "macros")
   "K" 'kmacro-call-macro)
@@ -903,20 +907,29 @@ shown already, it is deleted instead."
   "xi" 'hydra-transient-special-characters/body
 )
 
-(defun mk/theme-toggle ()
-  (interactive)
-  (modus-themes-toggle)
-  ;; Can be used to ensure that the fringe has the same color
-  ;; as the gutter.  However, leads to artifacts near the echo
-  ;; area.
-  (set-face-attribute 'fringe nil
-     :background (face-background 'org-block-begin-line)
-     :foreground (face-foreground 'modus-themes-hl-line)))
+(defcustom doom-theme-var "light"
+   "Variable which sets the default startup theme as light or dark.
+ Also allows for toggling of the themes.
+ Defaults to nil."
+   :group 'doom
+   :type 'string)
 
-(leader-set-keys
-  "T" '(:ignore t :wk "Theme")
-  "Ts" 'modus-themes-toggle
-)
+ (defun mk/doom-toggle-theme ()
+   "Function to interactively toggle between light and dark doom themes.
+ Requires both to be loaded in order to work."
+   (interactive)
+   (cond ((string= doom-theme-var "light")
+          (progn (load-theme 'doom-tomorrow-night t)
+                 (setq doom-theme-var "dark")))
+          ((string= doom-theme-var "dark")
+          (progn (load-theme 'doom-tomorrow-day t)
+                 (setq doom-theme-var "light")))
+          (t nil))) 
+
+  (leader-set-keys
+    "T" '(:ignore t :wk "Theme")
+    "Ts" 'mk/doom-toggle-theme
+  )
 
 (leader-set-keys
   "t" '(:ignore t :wk "toggles")
