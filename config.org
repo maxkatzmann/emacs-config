@@ -157,20 +157,25 @@ Splitting to a terminal.
 
 #+begin_src emacs-lisp
 (defun mk/split-to-shell ()
-   "If no *shell* buffer exists, one is created using the `shell` function
-and it is displayed in a new window at the ver bottom. If such a window is
-shown already, it is deleted instead."
-   (interactive)
-   (let ((shell-window (get-buffer-window "*shell*")))
-     (if shell-window
+  "If no *shell* buffer exists, one is created using the `shell` function
+  and it is displayed in a new window at the ver bottom. If such a window is
+  shown already, it is deleted instead."
+  (interactive)
+  (let ((shell-window (get-buffer-window "*shell*")))
+    (if shell-window
+       (progn
+         (delete-window shell-window))
         (progn
-          (delete-window shell-window))
-         (progn
-         (split-and-follow-horizontally)
-         (evil-window-move-very-bottom)
-         (unless (get-buffer "*shell*")
-           (shell))
-         (switch-to-buffer "*shell*")))))
+        (split-and-follow-horizontally)
+        (evil-window-move-very-bottom)
+        (unless (get-buffer "*shell*")
+          (shell))
+        (switch-to-buffer "*shell*")))))
+
+(defun mk/split-to-shell-fullscreen ()
+  (interactive)
+  (mk/split-to-shell)
+  (delete-other-windows))
 #+end_src
 
 * Theme
@@ -269,64 +274,66 @@ Nano disables the fringe.  We want it back.
 
 #+end_src
 
-* Window Management
+* Window Management (EXWM)
 #+begin_src emacs-lisp
-    (defun efs/run-in-background (command)
-      (let ((command-parts (split-string command "[ ]+")))
-        (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
+  (defun efs/run-in-background (command)
+    (let ((command-parts (split-string command "[ ]+")))
+      (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
 
-    (defun efs/exwm-init-hook ()
-      ;; Make workspace 1 be the one where we land at startup
-      (exwm-workspace-switch-create 1)
+  (defun efs/exwm-init-hook ()
+    ;; Make workspace 1 be the one where we land at startup
+    (exwm-workspace-switch-create 1)
 
-      ;; Open eshell by default
-      ;;(eshell)
+    ;; Open eshell by default
+    ;;(eshell)
 
-      ;; NOTE: The next two are disabled because we now use Polybar!
+    ;; NOTE: The next two are disabled because we now use Polybar!
 
-      ;; Show battery status in the mode line
-      ;;(display-battery-mode 1)
+    ;; Show battery status in the mode line
+    ;;(display-battery-mode 1)
 
-      ;; Show the time and date in modeline
-      ;;(setq display-time-day-and-date t)
-      ;;(display-time-mode 1)
-      ;; Also take a look at display-time-format and format-time-string
+    ;; Show the time and date in modeline
+    ;;(setq display-time-day-and-date t)
+    ;;(display-time-mode 1)
+    ;; Also take a look at display-time-format and format-time-string
 
-      ;; Start the Polybar panel
-      (efs/start-panel)
+    ;; Start the Polybar panel
+    (efs/start-panel)
 
-      ;; Launch apps that will run in the background
-      ;; (efs/run-in-background "dunst")
-      (efs/run-in-background "nm-applet")
-      ;; (efs/run-in-background "pasystray")
-      ;; (efs/run-in-background "blueman-applet")
-    )
+    ;; Launch apps that will run in the background
+    ;; (efs/run-in-background "dunst")
+    (efs/run-in-background "nm-applet")
+    ;; (efs/run-in-background "pasystray")
+    ;; (efs/run-in-background "blueman-applet")
+  )
 
-    (defun efs/exwm-update-class ()
-      (exwm-workspace-rename-buffer exwm-class-name))
+  (defun efs/exwm-update-class ()
+    (exwm-workspace-rename-buffer exwm-class-name))
 
-    ;; (defun efs/exwm-configure-window-by-class ()
-    ;;   (interactive)
-    ;;   (pcase exwm-class-name
-    ;;      ))
+  ;; (defun efs/exwm-configure-window-by-class ()
+  ;;   (interactive)
+  ;;   (pcase exwm-class-name
+  ;;      ))
 
-    (use-package exwm :config
-      (setq exwm-workspace-number 5)
+  (use-package exwm :config
+    (setq exwm-workspace-number 5)
 
-      (add-hook 'exwm-init-hook #'efs/exwm-init-hook)
+    (add-hook 'exwm-init-hook #'efs/exwm-init-hook)
 
-      ;; When window "class" updates, use it to set the buffer name
-      (add-hook 'exwm-update-class-hook #'efs/exwm-update-class)
+    ;; When window "class" updates, use it to set the buffer name
+    (add-hook 'exwm-update-class-hook #'efs/exwm-update-class)
 
-      ;; Automatically send the mouse cursor to the selected workspace's display
-      (setq exwm-workspace-warp-cursor t)
+    ;; Automatically send the mouse cursor to the selected workspace's display
+    (setq exwm-workspace-warp-cursor t)
 
-      ;; Window focus should follow the mouse pointer
-      (setq mouse-autoselect-window t
-            focus-follows-mouse t)
+    ;; Window focus should follow the mouse pointer
+    ;; (setq mouse-autoselect-window t
+    ;;       focus-follows-mouse t)
 
-      ;; These keys should always pass through to Emacs
-  ;; These keys should always pass through to Emacs
+    (require 'exwm-randr)
+    (exwm-randr-enable)
+
+    ;; These keys should always pass through to Emacs
     (setq exwm-input-prefix-keys
       '(?\C-x
         ?\C-u
@@ -346,49 +353,49 @@ Nano disables the fringe.  We want it back.
     ;; Set up global key bindings.  These always work, no matter the input state!
     ;; Keep in mind that changing this list after EXWM initializes has no effect.
     (setq exwm-input-global-keys
-          `(
-            ;; Reset to line-mode (C-c C-k switches to char-mode via exwm-input-release-keyboard)
-            ([?\s-r] . exwm-reset)
+      `(
+       ;; Reset to line-mode (C-c C-k switches to char-mode via exwm-input-release-keyboard)
+       ([?\s-r] . exwm-reset)
 
-            ;; Move between windows
-            ([?\s-h] . windmove-left)
-            ([?\s-l] . windmove-right)
-            ([?\s-k] . windmove-up)
-            ([?\s-j] . windmove-down)
+       ;; Move between windows
+       ([?\s-h] . windmove-left)
+       ([?\s-l] . windmove-right)
+       ([?\s-k] . windmove-up)
+       ([?\s-j] . windmove-down)
 
-            ;; Launch applications via shell command
-            ([?\s-&] . (lambda (command)
-                         (interactive (list (read-shell-command "$ ")))
-                         (start-process-shell-command command nil command)))
+       ;; Launch applications via shell command
+       ([?\s-&] . (lambda (command)
+                    (interactive (list (read-shell-command "$ ")))
+                    (start-process-shell-command command nil command)))
 
-            ;; Switch workspace
-            ([?\s-w] . hydra-transient-exwm-window-management/body)
-            ([?\s-`] . (lambda () (interactive) (exwm-workspace-switch-create 0)))
+       ;; Switch workspace
+       ([?\s-w] . hydra-transient-exwm-window-management/body)
+       ([?\s-`] . (lambda () (interactive) (exwm-workspace-switch-create 0)))
 
-            ;; s-Shift-N to move a window to a workspace
-            ([?\s-!] . (lambda () (interactive) (exwm-workspace-move-window 1)))
-            ([?\s-@] . (lambda () (interactive) (exwm-workspace-move-window 2)))
-            ([?\s-#] . (lambda () (interactive) (exwm-workspace-move-window 3)))
-            ([?\s-$] . (lambda () (interactive) (exwm-workspace-move-window 4)))
-            ([?\s-%] . (lambda () (interactive) (exwm-workspace-move-window 5)))
-            ([?\s-^] . (lambda () (interactive) (exwm-workspace-move-window 6)))
-            ([?\s-&] . (lambda () (interactive) (exwm-workspace-move-window 7)))
-            ([?\s-*] . (lambda () (interactive) (exwm-workspace-move-window 8)))
-            ;; ([?\s-(] . (lambda () (interactive) (exwm-workspace-move-window 9)))
-            ;; ([?\s-)] . (lambda () (interactive) (exwm-workspace-move-window 0)))
+       ;; s-Shift-N to move a window to a workspace
+       ([?\s-!] . (lambda () (interactive) (exwm-workspace-move-window 1)))
+       ([?\s-@] . (lambda () (interactive) (exwm-workspace-move-window 2)))
+       ([?\s-#] . (lambda () (interactive) (exwm-workspace-move-window 3)))
+       ([?\s-$] . (lambda () (interactive) (exwm-workspace-move-window 4)))
+       ([?\s-%] . (lambda () (interactive) (exwm-workspace-move-window 5)))
+       ([?\s-^] . (lambda () (interactive) (exwm-workspace-move-window 6)))
+       ([?\s-&] . (lambda () (interactive) (exwm-workspace-move-window 7)))
+       ([?\s-*] . (lambda () (interactive) (exwm-workspace-move-window 8)))
+       ;; ([?\s-(] . (lambda () (interactive) (exwm-workspace-move-window 9)))
+       ;; ([?\s-)] . (lambda () (interactive) (exwm-workspace-move-window 0)))
 
-            ;; 's-N': Switch to certain workspace with Super (Win) plus a number key (0 - 9)
-            ,@(mapcar (lambda (i)
-                        `(,(kbd (format "s-%d" i)) .
-                          (lambda ()
-                            (interactive)
-                            (exwm-workspace-switch-create ,i))))
-                      (number-sequence 0 9))))
+       ;; 's-N': Switch to certain workspace with Super (Win) plus a number key (0 - 9)
+       ,@(mapcar (lambda (i)
+                   `(,(kbd (format "s-%d" i)) .
+                     (lambda ()
+                       (interactive)
+                       (exwm-workspace-switch-create ,i))))
+                 (number-sequence 0 9))))
 
-        (exwm-input-set-key (kbd "s-SPC") 'counsel-linux-app)
-        (exwm-input-set-key (kbd "M-SPC") 'counsel-M-x)
+      (exwm-input-set-key (kbd "s-SPC") 'counsel-linux-app)
+      (exwm-input-set-key (kbd "M-SPC") 'counsel-M-x)
 
-        (exwm-enable))
+      (exwm-enable))
 #+end_src
 
 ** Desktop Environment
@@ -446,6 +453,21 @@ For polybar we need [[https://aur.archlinux.org/packages/ttf-font-awesome-4][ttf
 
 ;; Update panel indicator when workspace changes
 (add-hook 'exwm-workspace-switch-hook #'efs/send-polybar-exwm-workspace)
+#+end_src
+
+** External Monitors
+#+begin_src emacs-lisp
+  (defun mk/start-hdmi-output ()
+    (interactive)
+    ;; (start-process-shell-command "xrandr" nil "xrandr --output eDP1 --primary --mode 2560x1600 --pos 0x0 --rotate normal --output DP1 --off --output DP2 --off --output HDMI1 --off --output HDMI2 --mode 1920x1200 --pos 2560x0 --rotate normal --output VIRTUAL1 --off")
+    (start-process-shell-command "xrandr" nil "xrandr --output eDP1 --primary --mode 2560x1600 --pos 0x0 --rotate normal --output DP1 --off --output DP2 --off --output HDMI1 --off --output HDMI2 --mode 1920x1080 --pos 2560x0 --rotate normal --output VIRTUAL1 --off")
+    (setq exwm-randr-workspace-monitor-plist '(1 "eDP1" 2 "HDMI2"))
+    (exwm-randr-refresh))
+
+  (defun mk/stop-hdmi-output ()
+    (interactive)
+    (start-process-shell-command "xrandr" nil "xrandr --output eDP1 --primary --mode 2560x1600 --pos 0x0 --rotate normal --output DP1 --off --output DP2 --off --output HDMI1 --off --output HDMI2 --off --output VIRTUAL1 --off")
+    (exwm-randr-refresh))
 #+end_src
 
 * UI
@@ -1932,33 +1954,36 @@ Transient state for inserting Special characters. (äÄüÜöÖß)
 *** Windows
 
 #+begin_src emacs-lisp
-;; Transient state for window resizing
-(defhydra hydra-transient-window-resize (:timeout 4)
-  "resize window cyclically"
-  ("+" mk/enlarge-window "enlarge window")
-  ("-" mk/shrink-window "shrink window")
-  ("=" balance-windows "balance windows")
-  ("s" cycle-resize-window-vertically "resize vertically")
-  ("v" cycle-resize-window-horizontally "resize horizontally"))
+  ;; Transient state for window resizing
+  (defhydra hydra-transient-window-resize (:timeout 4)
+    "resize window cyclically"
+    ("+" mk/enlarge-window "enlarge window")
+    ("-" mk/shrink-window "shrink window")
+    ("=" balance-windows "balance windows")
+    ("s" cycle-resize-window-vertically "resize vertically")
+    ("v" cycle-resize-window-horizontally "resize horizontally"))
 
-(leader-set-keys
-  "w" '(:ignore t :wk "window")
-  "wd" 'delete-window
-  "wD" 'delete-other-windows
-  "wv" 'split-and-follow-vertically
-  "ws" 'split-and-follow-horizontally
-  "wl" 'evil-window-right
-  "wL" 'evil-window-move-far-right
-  "wh" 'evil-window-left
-  "wH" 'evil-window-move-far-left
-  "wj" 'evil-window-down
-  "wJ" 'evil-window-move-very-bottom
-  "wk" 'evil-window-up
-  "wK" 'evil-window-move-very-top
-  "wt" 'mk/split-to-shell
-  "wr" 'hydra-transient-window-resize/body
-  "ww" 'writeroom-mode
-)
+  (leader-set-keys
+    "w" '(:ignore t :wk "window")
+    "wd" 'delete-window
+    "wD" 'delete-other-windows
+    "wv" 'split-and-follow-vertically
+    "ws" 'split-and-follow-horizontally
+    "wl" 'evil-window-right
+    "wL" 'evil-window-move-far-right
+    "wh" 'evil-window-left
+    "wH" 'evil-window-move-far-left
+    "wj" 'evil-window-down
+    "wJ" 'evil-window-move-very-bottom
+    "wk" 'evil-window-up
+    "wK" 'evil-window-move-very-top
+    "wt" 'mk/split-to-shell
+    "wT" 'mk/split-to-shell-fullscreen
+    "wr" 'hydra-transient-window-resize/body
+    "wx" 'mk/start-hdmi-output
+    "wX" 'mk/stop-hdmi-output
+    "ww" 'writeroom-mode
+  )
 
 #+end_src
 
@@ -1969,12 +1994,12 @@ We setup transient states for manual window management.
   (defhydra hydra-transient-exwm-window-management (:timeout 4
                                                     :hint nil)
     "
-    ^Focus^       ^Move^        ^Split^             ^Delete^             ^Other
-    ^^^^^^^^-------------------------------------------------------------------------
-    _h_: left     _H_: Left     _v_ vertically      _d_ delete window    _r_ resize
-    _l_: right    _L_: Right    _s_ horizontally    _D_ delete other     _m_ move
-    _k_: up       _K_: Up       _t_ terminal        _q_ kill
-    _j_: down     _J_: Down
+    ^Focus^       ^Move^        ^Split^                   ^Delete^             ^Other
+    ^^^^^^^^--------------------------------------------------------------------------------
+    _h_: left     _H_: Left     _v_ vertically            _d_ delete window    _r_ resize
+    _l_: right    _L_: Right    _s_ horizontally          _D_ delete other     _m_ move
+    _k_: up       _K_: Up       _t_ splitscreen terminal  _q_ kill             _x_ external start
+    _j_: down     _J_: Down     _T_ fullscreen terminal                      _X_ external stop
     "
       ("v" split-and-follow-vertically nil :exit t)
       ("s" split-and-follow-horizontally nil :exit t)
@@ -1990,8 +2015,11 @@ We setup transient states for manual window management.
       ("D" delete-other-windows :exit t)
       ("q" kill-this-buffer :exit t)
       ("t" mk/split-to-shell :exit t)
+      ("T" mk/split-to-shell-fullscreen :exit t)
       ("m" hydra-transient-exwm-window-move/body :exit t)
-      ("r" hydra-transient-window-resize/body :exit t))
+      ("r" hydra-transient-window-resize/body :exit t)
+      ("x" mk/start-hdmi-output :exit t)
+      ("X" mk/stop-hdmi-output :exit t))
 
     (defhydra hydra-transient-exwm-window-move (:timeout 4)
       "Move window"
