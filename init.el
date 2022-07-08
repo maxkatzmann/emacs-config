@@ -17,6 +17,8 @@
 
 (straight-use-package 'org)
 
+(setq mac-command-modifier 'meta)
+
 (setq-default evil-kill-on-visual-paste nil)
 
 (use-package unfill)
@@ -318,6 +320,8 @@
     '("\\.ipe" "/Applications/Ipe.app/Contents/MacOS/ipe" (file))
     '("\\.pdf" "/Applications/Skim.app/Contents/MacOS/Skim" (file))))
 (openwith-mode 1)
+
+(use-package rg)
 
 (use-package bazel
   :config
@@ -848,7 +852,7 @@
 (leader-set-keys-for-major-mode 'org-mode "c" 'org-toggle-checkbox)
 
 (leader-set-keys
-  "/" 'projectile-grep
+  "/" 'counsel-rg
 )
 
 (leader-set-keys-for-major-mode 'python-mode "=" 'yapfify-buffer)

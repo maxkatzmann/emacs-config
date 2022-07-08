@@ -39,19 +39,22 @@ We need this to fix an issue with `org-file-name-concat` having a void function 
 
 * General
 
+On macOS we need to specify that we want to use command as meta key.
+#+begin_src emacs-lisp
+(setq mac-command-modifier 'meta)
+#+end_src
+
 We do not want the contents of the clipboard to be overwritten when
 pasting something in visual mode.
 
 #+begin_src emacs-lisp
 (setq-default evil-kill-on-visual-paste nil)
-
 #+end_src
 
 Unfilling allows us to collapse a paragraph into a line.
 
 #+begin_src emacs-lisp
 (use-package unfill)
-
 #+end_src
 
 Make use of the undo tree
@@ -62,14 +65,12 @@ Make use of the undo tree
   (global-undo-tree-mode)
   :custom
   (undo-tree-auto-save-history nil))
-
 #+end_src
 
 Easily convert text to title case
 
 #+begin_src emacs-lisp
 (use-package titlecase)
-
 #+end_src
 
 To make sure that the locale is set correctly (required by magit), we
@@ -694,6 +695,11 @@ Configure that certain files are opened externally.
     '("\\.ipe" "/Applications/Ipe.app/Contents/MacOS/ipe" (file))
     '("\\.pdf" "/Applications/Skim.app/Contents/MacOS/Skim" (file))))
 (openwith-mode 1)
+#+end_src
+
+** Search
+#+begin_src emacs-lisp
+(use-package rg)
 #+end_src
 
 * Programming
@@ -1627,8 +1633,6 @@ Allows us to use SPC for all kinds of actions, just like spacemacs.
 )
 
 #+end_src
-
-
 *** Jupyter
 #+begin_src emacs-lisp
 (leader-set-keys-for-major-mode 'python-mode "c" 'ein:worksheet-execute-cell-km)
@@ -1640,8 +1644,6 @@ Allows us to use SPC for all kinds of actions, just like spacemacs.
   "K" '(:ignore t :wk "macros")
   "K" 'kmacro-call-macro)
 #+end_src
-
-
 *** Org
 
 #+begin_src emacs-lisp
@@ -1694,7 +1696,7 @@ Allows us to use SPC for all kinds of actions, just like spacemacs.
 
 #+begin_src emacs-lisp
 (leader-set-keys
-  "/" 'projectile-grep
+  "/" 'counsel-rg
 )
 
 #+end_src
