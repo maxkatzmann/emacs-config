@@ -728,7 +728,7 @@
 
 (leader-set-keys
   "a" '(:ignore t :wk "applications")
-  "ad" 'dirvish-dired
+  "ad" 'dired-jump
 )
 
 (leader-set-keys-for-major-mode 'bazel-mode "=" 'bazel-buildifier)

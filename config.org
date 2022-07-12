@@ -1513,7 +1513,7 @@ Allows us to use SPC for all kinds of actions, just like spacemacs.
 #+begin_src emacs-lisp
 (leader-set-keys
   "a" '(:ignore t :wk "applications")
-  "ad" 'dirvish-dired
+  "ad" 'dired-jump
 )
 
 #+end_src
