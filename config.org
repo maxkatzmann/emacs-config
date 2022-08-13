@@ -26,7 +26,10 @@
 #+begin_src emacs-lisp
 (straight-use-package 'use-package)
 (use-package straight
-             :custom (straight-use-package-by-default t))
+               :custom (straight-use-package-by-default t))
+
+(require 'use-package-ensure)
+(setq use-package-always-ensure t)
 
 #+end_src
 
@@ -39,9 +42,10 @@ We need this to fix an issue with `org-file-name-concat` having a void function 
 
 * General
 
-On macOS we need to specify that we want to use command as meta key.
+Server
+
 #+begin_src emacs-lisp
-(setq mac-command-modifier 'meta)
+(server-start)
 #+end_src
 
 We do not want the contents of the clipboard to be overwritten when
@@ -311,6 +315,202 @@ Nano disables the fringe.  We want it back.
 
 #+end_src
 
+* Window Management (EXWM)
+#+begin_src emacs-lisp :tangle no
+  (defun efs/run-in-background (command)
+    (let ((command-parts (split-string command "[ ]+")))
+      (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
+
+  (defun efs/exwm-init-hook ()
+    ;; Make workspace 1 be the one where we land at startup
+    (exwm-workspace-switch-create 1)
+
+    ;; Open eshell by default
+    ;;(eshell)
+
+    ;; NOTE: The next two are disabled because we now use Polybar!
+
+    ;; Show battery status in the mode line
+    ;;(display-battery-mode 1)
+
+    ;; Show the time and date in modeline
+    ;;(setq display-time-day-and-date t)
+    ;;(display-time-mode 1)
+    ;; Also take a look at display-time-format and format-time-string
+
+    ;; Start the Polybar panel
+    (efs/start-panel)
+
+    ;; Launch apps that will run in the background
+    ;; (efs/run-in-background "dunst")
+    (efs/run-in-background "nm-applet")
+    ;; (efs/run-in-background "pasystray")
+    ;; (efs/run-in-background "blueman-applet")
+  )
+
+  (defun efs/exwm-update-class ()
+    (exwm-workspace-rename-buffer exwm-class-name))
+
+  ;; (defun efs/exwm-configure-window-by-class ()
+  ;;   (interactive)
+  ;;   (pcase exwm-class-name
+  ;;      ))
+
+  (use-package exwm :config
+    (setq exwm-workspace-number 5)
+
+    (add-hook 'exwm-init-hook #'efs/exwm-init-hook)
+
+    ;; When window "class" updates, use it to set the buffer name
+    (add-hook 'exwm-update-class-hook #'efs/exwm-update-class)
+
+    ;; Automatically send the mouse cursor to the selected workspace's display
+    (setq exwm-workspace-warp-cursor t)
+
+    ;; Window focus should follow the mouse pointer
+    ;; (setq mouse-autoselect-window t
+    ;;       focus-follows-mouse t)
+
+    (require 'exwm-randr)
+    (exwm-randr-enable)
+
+    ;; These keys should always pass through to Emacs
+    (setq exwm-input-prefix-keys
+      '(?\C-x
+        ?\C-u
+        ?\C-h
+        ?\M-x
+        ?\M-\  
+        ?\M-`
+        ?\M-&
+        ?\M-:
+        ?\M-w
+        ?\C-\M-j  ;; Buffer list
+        ?\C-\ ))  ;; Ctrl+Space
+
+    ;; Ctrl+Q will enable the next key to be sent directly
+    (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
+
+    ;; Set up global key bindings.  These always work, no matter the input state!
+    ;; Keep in mind that changing this list after EXWM initializes has no effect.
+    (setq exwm-input-global-keys
+      `(
+       ;; Reset to line-mode (C-c C-k switches to char-mode via exwm-input-release-keyboard)
+       ([?\s-r] . exwm-reset)
+
+       ;; Move between windows
+       ([?\s-h] . windmove-left)
+       ([?\s-l] . windmove-right)
+       ([?\s-k] . windmove-up)
+       ([?\s-j] . windmove-down)
+
+       ;; Launch applications via shell command
+       ([?\s-&] . (lambda (command)
+                    (interactive (list (read-shell-command "$ ")))
+                    (start-process-shell-command command nil command)))
+
+       ;; Switch workspace
+       ([?\s-w] . hydra-transient-exwm-window-management/body)
+       ([?\s-`] . (lambda () (interactive) (exwm-workspace-switch-create 0)))
+
+       ;; s-Shift-N to move a window to a workspace
+       ([?\s-!] . (lambda () (interactive) (exwm-workspace-move-window 1)))
+       ([?\s-@] . (lambda () (interactive) (exwm-workspace-move-window 2)))
+       ([?\s-#] . (lambda () (interactive) (exwm-workspace-move-window 3)))
+       ([?\s-$] . (lambda () (interactive) (exwm-workspace-move-window 4)))
+       ([?\s-%] . (lambda () (interactive) (exwm-workspace-move-window 5)))
+       ([?\s-^] . (lambda () (interactive) (exwm-workspace-move-window 6)))
+       ([?\s-&] . (lambda () (interactive) (exwm-workspace-move-window 7)))
+       ([?\s-*] . (lambda () (interactive) (exwm-workspace-move-window 8)))
+       ;; ([?\s-(] . (lambda () (interactive) (exwm-workspace-move-window 9)))
+       ;; ([?\s-)] . (lambda () (interactive) (exwm-workspace-move-window 0)))
+
+       ;; 's-N': Switch to certain workspace with Super (Win) plus a number key (0 - 9)
+       ,@(mapcar (lambda (i)
+                   `(,(kbd (format "s-%d" i)) .
+                     (lambda ()
+                       (interactive)
+                       (exwm-workspace-switch-create ,i))))
+                 (number-sequence 0 9))))
+
+      (exwm-input-set-key (kbd "s-SPC") 'counsel-linux-app)
+      (exwm-input-set-key (kbd "M-SPC") 'counsel-M-x)
+
+      (exwm-enable))
+#+end_src
+
+** Desktop Environment
+
+To control the screen brightness, we need to install the ~brightnessctl~
+package.
+
+#+begin_src emacs-lisp :tangle no
+
+  (use-package desktop-environment
+    :after exwm
+    :config 
+    (setq desktop-environment-update-exwm-global-keys :prefix)
+    (define-key desktop-environment-mode-map (kbd "s-l") nil)
+    (desktop-environment-mode)
+    :custom
+    (desktop-environment-brightness-small-increment "2%+")
+    (desktop-environment-brightness-small-decrement "2%-")
+    (desktop-environment-brightness-normal-increment "5%+")
+    (desktop-environment-brightness-normal-decrement "5%-"))
+  
+#+end_src
+
+** Dynamic tiling
+
+#+begin_src emacs-lisp
+;; (use-package edwina)
+#+end_src
+
+** Polybar
+
+For polybar we need [[https://aur.archlinux.org/packages/ttf-font-awesome-4][ttf-font-awesome-4]].
+
+#+begin_src emacs-lisp :tangle no
+(defvar efs/polybar-process nil
+  "Holds the process of the running Polybar instance, if any")
+
+(defun efs/kill-panel ()
+  (interactive)
+  (when efs/polybar-process
+    (ignore-errors
+      (kill-process efs/polybar-process)))
+  (setq efs/polybar-process nil))
+
+(defun efs/start-panel ()
+  (interactive)
+  (efs/kill-panel)
+  (setq efs/polybar-process (start-process-shell-command "polybar" nil "polybar panel")))
+
+(defun efs/send-polybar-hook (module-name hook-index)
+  (start-process-shell-command "polybar-msg" nil (format "polybar-msg hook %s %s" module-name hook-index)))
+
+(defun efs/send-polybar-exwm-workspace ()
+  (efs/send-polybar-hook "exwm-workspace" 1))
+
+;; Update panel indicator when workspace changes
+(add-hook 'exwm-workspace-switch-hook #'efs/send-polybar-exwm-workspace)
+#+end_src
+
+** External Monitors
+#+begin_src emacs-lisp :tangle no
+  (defun mk/start-hdmi-output ()
+    (interactive)
+    ;; (start-process-shell-command "xrandr" nil "xrandr --output eDP1 --primary --mode 2560x1600 --pos 0x0 --rotate normal --output DP1 --off --output DP2 --off --output HDMI1 --off --output HDMI2 --mode 1920x1200 --pos 2560x0 --rotate normal --output VIRTUAL1 --off")
+    (start-process-shell-command "xrandr" nil "xrandr --output eDP1 --primary --mode 2560x1600 --pos 0x0 --rotate normal --output DP1 --off --output DP2 --off --output HDMI1 --off --output HDMI2 --mode 1920x1080 --pos 2560x0 --rotate normal --output VIRTUAL1 --off")
+    (setq exwm-randr-workspace-monitor-plist '(1 "eDP1" 2 "HDMI2"))
+    (exwm-randr-refresh))
+
+  (defun mk/stop-hdmi-output ()
+    (interactive)
+    (start-process-shell-command "xrandr" nil "xrandr --output eDP1 --primary --mode 2560x1600 --pos 0x0 --rotate normal --output DP1 --off --output DP2 --off --output HDMI1 --off --output HDMI2 --off --output VIRTUAL1 --off")
+    (exwm-randr-refresh))
+#+end_src
+
 * UI
 
 ** General
@@ -494,7 +694,11 @@ By specifying `:tangle no` on this block, we disable it.
 ** Counsel
 
 #+begin_src emacs-lisp
-(use-package counsel)
+(use-package counsel
+  :custom
+  (counsel-linux-app-format-function #'counsel-linux-app-format-function-name-only)
+  :config
+  (counsel-mode 1))
 
 #+end_src
 
@@ -824,7 +1028,9 @@ Setup Synctex
 
 PDF Output
 
-#+begin_src emacs-lisp
+macOS
+
+#+begin_src emacs-lisp :tangle no
 (setq TeX-view-program-list
   '(("Zathura"
                  ("zathura "
@@ -1175,7 +1381,7 @@ logging of state changes, e.g., when a TODO is changed to DONE.)
 #+begin_src emacs-lisp
 (use-package org-roam
   :config
-  (setq org-roam-directory (file-truename "~/Documents/org-roam"))
+  (setq org-roam-directory (file-truename "/mnt/chromeos/GoogleDrive/MyDrive/Documents/org-roam"))
   (org-roam-db-autosync-mode)
 
   ;; Overwrite default capture template
@@ -1196,7 +1402,7 @@ our org-roam directory.
 #+begin_src emacs-lisp
 (defun org-agenda-refresh ()
   (interactive)
-  (setq org-agenda-files (directory-files-recursively "~/Documents/org-roam/" "\\.org$")))
+  (setq org-agenda-files (directory-files-recursively "/mnt/chromeos/GoogleDrive/MyDrive/Documents/org-roam/" "\\.org$")))
 (org-agenda-refresh)
 
 #+end_src
@@ -1866,14 +2072,14 @@ Transient state for inserting Special characters. (äÄüÜöÖß)
 *** Windows
 
 #+begin_src emacs-lisp
-;; Transient state for window resizing
-(defhydra hydra-transient-window-resize (:timeout 4)
-  "resize window cyclically"
-  ("+" mk/enlarge-window "enlarge window")
-  ("-" mk/shrink-window "shrink window")
-  ("=" balance-windows "balance windows")
-  ("s" cycle-resize-window-vertically "resize vertically")
-  ("v" cycle-resize-window-horizontally "resize horizontally"))
+  ;; Transient state for window resizing
+  (defhydra hydra-transient-window-resize (:timeout 4)
+    "resize window cyclically"
+    ("+" mk/enlarge-window "enlarge window")
+    ("-" mk/shrink-window "shrink window")
+    ("=" balance-windows "balance windows")
+    ("s" cycle-resize-window-vertically "resize vertically")
+    ("v" cycle-resize-window-horizontally "resize horizontally"))
 
 (leader-set-keys
   "w" '(:ignore t :wk "window")
@@ -1894,8 +2100,55 @@ Transient state for inserting Special characters. (äÄüÜöÖß)
   "wr" 'hydra-transient-window-resize/body
   "ww" 'writeroom-mode
 )
-
 #+end_src
+
+*** Window Management
+
+We setup transient states for manual window management.
+#+begin_src emacs-lisp
+  (defhydra hydra-transient-exwm-window-management (:timeout 4
+                                                    :hint nil)
+    "
+    ^Focus^       ^Move^        ^Split^                   ^Delete^             ^Other
+    ^^^^^^^^--------------------------------------------------------------------------------
+    _h_: left     _H_: Left     _v_ vertically            _d_ delete window    _r_ resize
+    _l_: right    _L_: Right    _s_ horizontally          _D_ delete other     _m_ move
+    _k_: up       _K_: Up       _t_ splitscreen terminal  _q_ kill             _x_ external start
+    _j_: down     _J_: Down     _T_ fullscreen terminal                      _X_ external stop
+    "
+      ("v" split-and-follow-vertically nil :exit t)
+      ("s" split-and-follow-horizontally nil :exit t)
+      ("l" evil-window-right :exit t)
+      ("h" evil-window-left :exit t)
+      ("j" evil-window-down :exit t)
+      ("k" evil-window-up :exit t)
+      ("L" evil-window-move-far-right :exit t)
+      ("H" evil-window-move-far-left :exit t)
+      ("J" evil-window-move-far-down :exit t)
+      ("K" evil-window-move-far-up :exit t)
+      ("d" delete-window :exit t)
+      ("D" delete-other-windows :exit t)
+      ("q" kill-this-buffer :exit t)
+      ("t" mk/split-to-shell :exit t)
+      ("T" mk/split-to-shell-fullscreen :exit t)
+      ("m" hydra-transient-exwm-window-move/body :exit t)
+      ("r" hydra-transient-window-resize/body :exit t)
+      ("x" mk/start-hdmi-output :exit t)
+      ("X" mk/stop-hdmi-output :exit t))
+
+    (defhydra hydra-transient-exwm-window-move (:timeout 4)
+      "Move window"
+      ("1" (exwm-workspace-move-window 1) "1" :exit t)
+      ("2" (exwm-workspace-move-window 2) "2" :exit t)
+      ("3" (exwm-workspace-move-window 3) "3" :exit t)
+      ("4" (exwm-workspace-move-window 4) "4" :exit t)
+      ("5" (exwm-workspace-move-window 5) "5" :exit t)
+      ("6" (exwm-workspace-move-window 6) "6" :exit t)
+      ("7" (exwm-workspace-move-window 7) "7" :exit t)
+      ("8" (exwm-workspace-move-window 8) "8" :exit t)
+      ("9" (exwm-workspace-move-window 9) "9" :exit t))
+#+end_src
+
 
 *** Zoom
 

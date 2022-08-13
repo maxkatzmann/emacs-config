@@ -13,11 +13,14 @@
 
 (straight-use-package 'use-package)
 (use-package straight
-             :custom (straight-use-package-by-default t))
+               :custom (straight-use-package-by-default t))
+
+(require 'use-package-ensure)
+(setq use-package-always-ensure t)
 
 (straight-use-package 'org)
 
-(setq mac-command-modifier 'meta)
+(server-start)
 
 (setq-default evil-kill-on-visual-paste nil)
 
@@ -165,6 +168,8 @@
 ;; (nano-theme-set-light)
 ;; (nano-refresh-theme)
 
+;; (use-package edwina)
+
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 
@@ -220,7 +225,11 @@
               (svg-lib-tag value nil
                            :stroke 0 :margin 0)) :ascent 'center)))
 
-(use-package counsel)
+(use-package counsel
+  :custom
+  (counsel-linux-app-format-function #'counsel-linux-app-format-function-name-only)
+  :config
+  (counsel-mode 1))
 
 (use-package ivy
   :config
@@ -372,14 +381,6 @@
 (setq TeX-source-correlate-mode t)
 (setq TeX-source-correlate-start-server t)
 (setq TeX-source-correlate-method 'synctex)
-
-(setq TeX-view-program-list
-  '(("Zathura"
-                 ("zathura "
-                  (mode-io-correlate " --synctex-forward %n:0:%b -x \"emacsclient +%{line} %{input}\" ")
-                  " %o")
-                 "zathura")))
-(setq TeX-view-program-selection '((output-pdf "Zathura")))
 
 (add-hook 'TeX-mode-hook (lambda ()
                            (lsp-ui-doc-mode -1)
@@ -574,7 +575,7 @@
 
 (use-package org-roam
   :config
-  (setq org-roam-directory (file-truename "~/Documents/org-roam"))
+  (setq org-roam-directory (file-truename "/mnt/chromeos/GoogleDrive/MyDrive/Documents/org-roam"))
   (org-roam-db-autosync-mode)
 
   ;; Overwrite default capture template
@@ -587,7 +588,7 @@
 
 (defun org-agenda-refresh ()
   (interactive)
-  (setq org-agenda-files (directory-files-recursively "~/Documents/org-roam/" "\\.org$")))
+  (setq org-agenda-files (directory-files-recursively "/mnt/chromeos/GoogleDrive/MyDrive/Documents/org-roam/" "\\.org$")))
 (org-agenda-refresh)
 
 (setq org-deadline-warning-days 14)
@@ -963,13 +964,13 @@
 )
 
 ;; Transient state for window resizing
-(defhydra hydra-transient-window-resize (:timeout 4)
-  "resize window cyclically"
-  ("+" mk/enlarge-window "enlarge window")
-  ("-" mk/shrink-window "shrink window")
-  ("=" balance-windows "balance windows")
-  ("s" cycle-resize-window-vertically "resize vertically")
-  ("v" cycle-resize-window-horizontally "resize horizontally"))
+  (defhydra hydra-transient-window-resize (:timeout 4)
+    "resize window cyclically"
+    ("+" mk/enlarge-window "enlarge window")
+    ("-" mk/shrink-window "shrink window")
+    ("=" balance-windows "balance windows")
+    ("s" cycle-resize-window-vertically "resize vertically")
+    ("v" cycle-resize-window-horizontally "resize horizontally"))
 
 (leader-set-keys
   "w" '(:ignore t :wk "window")
@@ -990,6 +991,48 @@
   "wr" 'hydra-transient-window-resize/body
   "ww" 'writeroom-mode
 )
+
+(defhydra hydra-transient-exwm-window-management (:timeout 4
+                                                  :hint nil)
+  "
+  ^Focus^       ^Move^        ^Split^                   ^Delete^             ^Other
+  ^^^^^^^^--------------------------------------------------------------------------------
+  _h_: left     _H_: Left     _v_ vertically            _d_ delete window    _r_ resize
+  _l_: right    _L_: Right    _s_ horizontally          _D_ delete other     _m_ move
+  _k_: up       _K_: Up       _t_ splitscreen terminal  _q_ kill             _x_ external start
+  _j_: down     _J_: Down     _T_ fullscreen terminal                      _X_ external stop
+  "
+    ("v" split-and-follow-vertically nil :exit t)
+    ("s" split-and-follow-horizontally nil :exit t)
+    ("l" evil-window-right :exit t)
+    ("h" evil-window-left :exit t)
+    ("j" evil-window-down :exit t)
+    ("k" evil-window-up :exit t)
+    ("L" evil-window-move-far-right :exit t)
+    ("H" evil-window-move-far-left :exit t)
+    ("J" evil-window-move-far-down :exit t)
+    ("K" evil-window-move-far-up :exit t)
+    ("d" delete-window :exit t)
+    ("D" delete-other-windows :exit t)
+    ("q" kill-this-buffer :exit t)
+    ("t" mk/split-to-shell :exit t)
+    ("T" mk/split-to-shell-fullscreen :exit t)
+    ("m" hydra-transient-exwm-window-move/body :exit t)
+    ("r" hydra-transient-window-resize/body :exit t)
+    ("x" mk/start-hdmi-output :exit t)
+    ("X" mk/stop-hdmi-output :exit t))
+
+  (defhydra hydra-transient-exwm-window-move (:timeout 4)
+    "Move window"
+    ("1" (exwm-workspace-move-window 1) "1" :exit t)
+    ("2" (exwm-workspace-move-window 2) "2" :exit t)
+    ("3" (exwm-workspace-move-window 3) "3" :exit t)
+    ("4" (exwm-workspace-move-window 4) "4" :exit t)
+    ("5" (exwm-workspace-move-window 5) "5" :exit t)
+    ("6" (exwm-workspace-move-window 6) "6" :exit t)
+    ("7" (exwm-workspace-move-window 7) "7" :exit t)
+    ("8" (exwm-workspace-move-window 8) "8" :exit t)
+    ("9" (exwm-workspace-move-window 9) "9" :exit t))
 
 (leader-set-keys
   "z" '(:ignore t :wk "zoom")
