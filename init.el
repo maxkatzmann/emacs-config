@@ -32,8 +32,10 @@
 (use-package titlecase)
 
 (use-package exec-path-from-shell
-  :config
-  (exec-path-from-shell-copy-envs '("LANG" "LC_ALL" "LC_CTYPES")))
+    :config
+    (exec-path-from-shell-copy-envs '("LANG" "LC_ALL" "LC_CTYPES")))
+  (setq exec-path (append exec-path '("/home/linuxbrew/.linuxbrew/bin/" "/home/linuxbrew/.linuxbrew/sbin")))
+(exec-path-from-shell-initialize)
 
 (use-package writeroom-mode
   :custom
@@ -107,7 +109,7 @@
 
 (set-face-attribute 'default nil
   :family "Roboto Mono"
-  :height 150
+  :height 140
   :weight 'medium
   :width 'normal)
 
@@ -372,8 +374,12 @@
 (setq TeX-source-correlate-method 'synctex)
 
 (setq TeX-view-program-list
-      '(("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")))
-(setq TeX-view-program-selection '((output-pdf "Skim")))
+  '(("Zathura"
+                 ("zathura "
+                  (mode-io-correlate " --synctex-forward %n:0:%b -x \"emacsclient +%{line} %{input}\" ")
+                  " %o")
+                 "zathura")))
+(setq TeX-view-program-selection '((output-pdf "Zathura")))
 
 (add-hook 'TeX-mode-hook (lambda ()
                            (lsp-ui-doc-mode -1)
@@ -834,6 +840,7 @@
       (when (or (org-entry-is-todo-p) (org-entry-is-done-p))
         (hide-entry)))))
 
+(leader-set-keys-for-major-mode 'org-mode "a" 'org-table-align)
 (leader-set-keys-for-major-mode 'org-mode "t" 'org-todo)
 (leader-set-keys-for-major-mode 'org-mode "f" 'org-fold-all-task-entries)
 (leader-set-keys-for-major-mode 'org-mode "s" 'org-schedule)
