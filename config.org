@@ -83,6 +83,12 @@ use `exec path from shell`.
 
 #+end_src
 
+Auto revert buffers when they change on disk
+
+#+begin_src emacs-lisp
+(global-auto-revert-mode t)
+#+end_src
+
 ** Writeroom
 
 This mode is nice if we want to focus on a single buffer and have in
