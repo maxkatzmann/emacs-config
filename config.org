@@ -1289,7 +1289,8 @@ specify for which languages we want to have this enabled.
   'org-babel-load-languages
     '((emacs-lisp . t)
       (python . t)
-      (ein . t)))
+      (ein . t)
+      (R . t)))
 
 #+end_src
 
