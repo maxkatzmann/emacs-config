@@ -986,7 +986,17 @@ Functions to change latex font environments (bold, emphasis, etc.)
 ** LSP
 
 #+begin_src emacs-lisp
-(straight-use-package 'lsp-mode)
+(use-package lsp-mode
+  :ensure t
+  :defer t
+  :init
+  (setq lsp-keep-workspace-alive nil
+        lsp-signature-doc-lines 5
+        ;; lsp-idle-delay 1
+        lsp-prefer-capf t)
+  :config
+  (advice-add #'lsp--auto-configure :override #'ignore))
+
 (straight-use-package 'lsp-ui)
 (straight-use-package 'lsp-ivy)
 
