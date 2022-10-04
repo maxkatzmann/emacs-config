@@ -1523,6 +1523,8 @@ Allows us to use SPC for all kinds of actions, just like spacemacs.
   "DEL"      'exit-recursive-edit
 )
 
+(define-key company-mode-map (kbd "<tab>") 'completion-at-point)
+
 #+end_src
 
 *** Applications
