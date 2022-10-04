@@ -89,6 +89,12 @@ Auto revert buffers when they change on disk
 (global-auto-revert-mode t)
 #+end_src
 
+Disable warnings about function redefinition
+
+#+begin_src emacs-lisp
+(setq ad-redefinition-action 'accept)
+#+end_src
+
 ** Writeroom
 
 This mode is nice if we want to focus on a single buffer and have in
