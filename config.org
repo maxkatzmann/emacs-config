@@ -1145,7 +1145,9 @@ type "<el" and hit TAB)
 (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 (add-to-list 'org-structure-template-alist '("py" . "src python"))
 (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+(add-to-list 'org-structure-template-alist '("tex" . "src latex"))
 (add-to-list 'org-structure-template-alist '("ein" . "src ein-python :session localhost"))
+(add-to-list 'org-structure-template-alist '("r" . "src R :session :exports both results output org"))
 
 #+end_src
 
