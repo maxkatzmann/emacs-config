@@ -1691,6 +1691,7 @@ Allows us to use SPC for all kinds of actions, just like spacemacs.
       (when (or (org-entry-is-todo-p) (org-entry-is-done-p))
         (hide-entry)))))
 
+(leader-set-keys-for-major-mode 'org-mode "a" 'org-table-align)
 (leader-set-keys-for-major-mode 'org-mode "t" 'org-todo)
 (leader-set-keys-for-major-mode 'org-mode "f" 'org-fold-all-task-entries)
 (leader-set-keys-for-major-mode 'org-mode "s" 'org-schedule)
