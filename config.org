@@ -901,7 +901,10 @@ Enable line numbers in Bibtex mode by default.
 Enable Reftex in AUCTeX
 
 #+begin_src emacs-lisp
-(add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+;; Fixes an issue where reftex won't search/find the bib-file initially.
+(add-hook 'TeX-mode-hook (lambda ()
+   (turn-on-reftex)
+   (reftex-parse-all)))
 
 #+end_src
 
@@ -918,6 +921,7 @@ Tell RefTeX where it should look for bib files.
 (setq reftex-external-file-finders
       '(("tex" . "kpsewhich -format=.tex %f")
         ("bib" . "kpsewhich -format=.bib %f")))
+(setq reftex-use-external-file-finders t)
 
 #+end_src
 
