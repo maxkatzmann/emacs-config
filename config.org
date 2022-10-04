@@ -214,17 +214,6 @@ add reload the config whenever we enter org-mode.
 
 #+end_src
 
-
-** Solaire Mode
-
-Load Solaire before loading the theme, so that Solaire is actually
-enabled.
-
-#+begin_src emacs-lisp :tangle no
-(use-package solaire-mode
-  :init (solaire-global-mode +1))
-#+end_src
-
 ** Doom
 #+begin_src emacs-lisp
 (use-package doom-themes
@@ -534,8 +523,12 @@ By specifying `:tangle no` on this block, we disable it.
   :after lsp-mode
   :hook (lsp-mode . (lambda ()
            (setq company-backend 'company-lsp)
-           (company-mode))))
-
+           (company-mode)))
+  :config
+  ;; Display completions after entering 2 characters
+  (setq company-minimum-prefix-length 2)
+  ;; Merge several company backends.
+  (add-to-list 'company-backends '(company-capf :with company-ispell company-lsp company-dabbrev :separate)))
 #+end_src
 
 ** Parentheses
