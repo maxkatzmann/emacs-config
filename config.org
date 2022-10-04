@@ -51,6 +51,11 @@ pasting something in visual mode.
 (setq-default evil-kill-on-visual-paste nil)
 #+end_src
 
+Make sure to set `evil-want-keybinding' to nil before loading evil or evil-collection.
+#+begin_src emacs-lisp
+(setq evil-want-keybinding nil)
+#+end_src
+
 Unfilling allows us to collapse a paragraph into a line.
 
 #+begin_src emacs-lisp
