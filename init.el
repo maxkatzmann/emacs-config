@@ -21,6 +21,8 @@
 
 (setq-default evil-kill-on-visual-paste nil)
 
+(setq evil-want-keybinding nil)
+
 (use-package unfill)
 
 (use-package undo-tree
@@ -34,6 +36,10 @@
 (use-package exec-path-from-shell
   :config
   (exec-path-from-shell-copy-envs '("LANG" "LC_ALL" "LC_CTYPES")))
+
+(global-auto-revert-mode t)
+
+(setq ad-redefinition-action 'accept)
 
 (use-package writeroom-mode
   :custom
@@ -99,7 +105,8 @@
   :config
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-        doom-themes-enable-italic t) ; if nil, italics is universally disabled
+        ;; The following has been disabled as it turned line numbers italic as well.
+        doom-themes-enable-italic nil) ; if nil, italics is universally disabled
   (load-theme 'doom-tomorrow-day t)
 
   ;; Corrects (and improves) org-mode's native fontification.
@@ -238,7 +245,12 @@
   :after lsp-mode
   :hook (lsp-mode . (lambda ()
            (setq company-backend 'company-lsp)
-           (company-mode))))
+           (company-mode)))
+  :config
+  ;; Display completions after entering 2 characters
+  (setq company-minimum-prefix-length 2)
+  ;; Merge several company backends.
+  (add-to-list 'company-backends '(company-capf :with company-ispell company-lsp company-dabbrev :separate)))
 
 (use-package smartparens
   :config
@@ -419,13 +431,17 @@
                               (display-line-numbers-mode)
                               (setq display-line-numbers 'relative)))
 
-(add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+;; Fixes an issue where reftex won't search/find the bib-file initially.
+(add-hook 'TeX-mode-hook (lambda ()
+   (turn-on-reftex)
+   (reftex-parse-all)))
 
 (setq reftex-plug-into-AUCTeX t)
 
 (setq reftex-external-file-finders
       '(("tex" . "kpsewhich -format=.tex %f")
         ("bib" . "kpsewhich -format=.bib %f")))
+(setq reftex-use-external-file-finders t)
 
 (setq reftex-format-cite-function 
   '(lambda (key fmt)
@@ -465,7 +481,17 @@
 (defun latex/font-oblique () (interactive) (TeX-font nil ?\C-s))
 (defun latex/font-upright () (interactive) (TeX-font nil ?\C-u))
 
-(straight-use-package 'lsp-mode)
+(use-package lsp-mode
+  :ensure t
+  :defer t
+  :init
+  (setq lsp-keep-workspace-alive nil
+        lsp-signature-doc-lines 5
+        ;; lsp-idle-delay 1
+        lsp-prefer-capf t)
+  :config
+  (advice-add #'lsp--auto-configure :override #'ignore))
+
 (straight-use-package 'lsp-ui)
 (straight-use-package 'lsp-ivy)
 
@@ -544,7 +570,9 @@
 (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 (add-to-list 'org-structure-template-alist '("py" . "src python"))
 (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+(add-to-list 'org-structure-template-alist '("tex" . "src latex"))
 (add-to-list 'org-structure-template-alist '("ein" . "src ein-python :session localhost"))
+(add-to-list 'org-structure-template-alist '("r" . "src R :session :exports both results output org"))
 
 (defun org-todo-list-LATER ()
   (interactive)
@@ -623,7 +651,8 @@
   'org-babel-load-languages
     '((emacs-lisp . t)
       (python . t)
-      (ein . t)))
+      (ein . t)
+      (R . t)))
 
 (setq org-confirm-babel-evaluate nil)
 
@@ -710,6 +739,10 @@
 
 (define-key evil-normal-state-map "/" 'swiper)
 
+;; Somehow previous and next need to be swapped here.
+(define-key evil-motion-state-map "n" 'evil-search-previous)
+(define-key evil-motion-state-map "N" 'evil-search-next)
+
 (use-package hydra)
 
 (use-package dash)
@@ -725,6 +758,8 @@
   "<escape>" 'abort-recursive-edit
   "DEL"      'exit-recursive-edit
 )
+
+(define-key company-mode-map (kbd "<tab>") 'completion-at-point)
 
 (leader-set-keys
   "a" '(:ignore t :wk "applications")
@@ -798,6 +833,7 @@
 (leader-set-keys
   "h" '(:ignore t :wk "hel")
   "hv" 'helpful-variable
+  "hk" 'helpful-key
   "hf" 'helpful-function
   "ht" 'helpful-at-point
 )
@@ -834,6 +870,7 @@
       (when (or (org-entry-is-todo-p) (org-entry-is-done-p))
         (hide-entry)))))
 
+(leader-set-keys-for-major-mode 'org-mode "a" 'org-table-align)
 (leader-set-keys-for-major-mode 'org-mode "t" 'org-todo)
 (leader-set-keys-for-major-mode 'org-mode "f" 'org-fold-all-task-entries)
 (leader-set-keys-for-major-mode 'org-mode "s" 'org-schedule)

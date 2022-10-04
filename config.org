@@ -1499,6 +1499,10 @@ We want to use swiper for search
 #+begin_src emacs-lisp
 (define-key evil-normal-state-map "/" 'swiper)
 
+;; Somehow previous and next need to be swapped here.
+(define-key evil-motion-state-map "n" 'evil-search-previous)
+(define-key evil-motion-state-map "N" 'evil-search-next)
+
 #+end_src
 
 ** Hydra
@@ -1658,6 +1662,7 @@ Allows us to use SPC for all kinds of actions, just like spacemacs.
 (leader-set-keys
   "h" '(:ignore t :wk "hel")
   "hv" 'helpful-variable
+  "hk" 'helpful-key
   "hf" 'helpful-function
   "ht" 'helpful-at-point
 )
