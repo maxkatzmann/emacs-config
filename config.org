@@ -985,7 +985,8 @@ Automatically include a tilde `~` before a citation.
   (setq auctex-latexmk-inherit-TeX-PDF-mode t)
   (auctex-latexmk-setup)
   (setq TeX-command-default "LatexMk")
-  (setq latex-build-command "LatexMk"))
+  (setq latex-build-command "LatexMk")
+  (setq LaTeX-electric-left-right-brace t)) ; Enable left/right auto-complete
 
 #+end_src
 
