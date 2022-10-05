@@ -204,7 +204,7 @@ Splitting to a terminal.
 Somehow, setting the org-heading sizes initially does not work, so we
 add reload the config whenever we enter org-mode.
 
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp
 (defun mk/reload-modus-config ()
   (setq modus-themes-region '(bg-only))
   (setq modus-themes-bold-constructs t)
@@ -219,14 +219,41 @@ add reload the config whenever we enter org-mode.
   (setq modus-themes-org-blocks 'tinted-background)
   (load-theme 'modus-operandi t))
 
-(use-package modus-themes
-  :init (mk/reload-modus-config)
-  :hook (org-mode . mk/reload-modus-config))
 
 #+end_src
 
-** Doom
+Actually loading modus themes.
+
 #+begin_src emacs-lisp
+(use-package modus-themes
+  :init (mk/reload-modus-config)
+  :hook (org-mode . mk/reload-modus-config))
+#+end_src
+
+Similar to solaire-mode, we change the background color of the
+minibuffer such that it can be better distinguished from the default
+buffer background.
+
+#+begin_src emacs-lisp
+  (defun minibuffer-bg ()
+     (set (make-local-variable 'face-remapping-alist)
+        (pcase (modus-themes--current-theme)
+           ('modus-operandi '((default :background "#f8f8f8")))
+           ('modus-vivendi '((default :background "#323232"))))))
+  (add-hook 'minibuffer-setup-hook 'minibuffer-bg)
+#+end_src
+
+
+** ef
+
+#+begin_src emacs-lisp :tangle no
+(use-package ef-themes
+  :config
+  (setq ef-themes-to-toggle '(ef-frost ef-duodark)))
+#+end_src
+
+** Doom
+#+begin_src emacs-lisp :tangle no
 (use-package doom-themes
   :ensure t
   :config
@@ -1868,7 +1895,7 @@ Transient state for inserting Special characters. (äÄüÜöÖß)
 
   (leader-set-keys
     "T" '(:ignore t :wk "Theme")
-    "Ts" 'mk/doom-toggle-theme
+    "Ts" 'modus-themes-toggle
   )
 
 #+end_src
