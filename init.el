@@ -100,17 +100,30 @@
   (mk/split-to-shell)
   (delete-other-windows))
 
-(use-package doom-themes
-  :ensure t
-  :config
-  ;; Global settings (defaults)
-  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-        ;; The following has been disabled as it turned line numbers italic as well.
-        doom-themes-enable-italic nil) ; if nil, italics is universally disabled
-  (load-theme 'doom-tomorrow-day t)
+(defun mk/reload-modus-config ()
+  (setq modus-themes-region '(bg-only))
+  (setq modus-themes-bold-constructs t)
+  (setq modus-themes-italic-constructs t)
+  (setq modus-themes-syntax '(faint))
+  (setq modus-themes-headings
+    '((1 . (overline background 1.3))
+      (2 . (background 1.2))
+      (3 . (bold 1.1))
+      (t . (1.05))))
+  (setq modus-themes-scale-headings t)
+  (setq modus-themes-org-blocks 'tinted-background)
+  (load-theme 'modus-operandi t))
 
-  ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config))
+(use-package modus-themes
+  :init (mk/reload-modus-config)
+  :hook (org-mode . mk/reload-modus-config))
+
+(defun minibuffer-bg ()
+   (set (make-local-variable 'face-remapping-alist)
+      (pcase (modus-themes--current-theme)
+         ('modus-operandi '((default :background "#f8f8f8")))
+         ('modus-vivendi '((default :background "#323232"))))))
+(add-hook 'minibuffer-setup-hook 'minibuffer-bg)
 
 (set-face-attribute 'default nil
   :family "Roboto Mono"
@@ -388,7 +401,6 @@
 (setq TeX-view-program-selection '((output-pdf "Skim")))
 
 (add-hook 'TeX-mode-hook (lambda ()
-                           (lsp-ui-doc-mode -1)
                            (setq fill-column 70)))
 
 (setq sentence-end-double-space t)
@@ -492,7 +504,7 @@
   :config
   (advice-add #'lsp--auto-configure :override #'ignore))
 
-(straight-use-package 'lsp-ui)
+(use-package lsp-ui)
 (straight-use-package 'lsp-ivy)
 
 (use-package yasnippet
@@ -979,7 +991,7 @@
 
   (leader-set-keys
     "T" '(:ignore t :wk "Theme")
-    "Ts" 'mk/doom-toggle-theme
+    "Ts" 'modus-themes-toggle
   )
 
 (leader-set-keys

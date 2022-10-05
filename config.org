@@ -871,7 +871,6 @@ We want a smaller fill-column than usual in latex mode.
 
 #+begin_src emacs-lisp
 (add-hook 'TeX-mode-hook (lambda ()
-                           (lsp-ui-doc-mode -1)
                            (setq fill-column 70)))
 
 #+end_src
@@ -1035,7 +1034,7 @@ Functions to change latex font environments (bold, emphasis, etc.)
   :config
   (advice-add #'lsp--auto-configure :override #'ignore))
 
-(straight-use-package 'lsp-ui)
+(use-package lsp-ui)
 (straight-use-package 'lsp-ivy)
 
 #+end_src
