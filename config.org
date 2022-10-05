@@ -1526,9 +1526,9 @@ We want to use swiper for search
 #+begin_src emacs-lisp
 (define-key evil-normal-state-map "/" 'swiper)
 
-;; Somehow previous and next need to be swapped here.
-(define-key evil-motion-state-map "n" 'evil-search-previous)
-(define-key evil-motion-state-map "N" 'evil-search-next)
+;; Somehow, sometimes? previous and next need to be swapped here.
+(define-key evil-motion-state-map "n" 'evil-search-next)
+(define-key evil-motion-state-map "N" 'evil-search-previous)
 
 #+end_src
 
