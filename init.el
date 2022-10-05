@@ -470,7 +470,8 @@
   (setq auctex-latexmk-inherit-TeX-PDF-mode t)
   (auctex-latexmk-setup)
   (setq TeX-command-default "LatexMk")
-  (setq latex-build-command "LatexMk"))
+  (setq latex-build-command "LatexMk")
+  (setq LaTeX-electric-left-right-brace t)) ; Enable left/right auto-complete
 
 (defun latex/build ()
   (interactive)
@@ -751,9 +752,9 @@
 
 (define-key evil-normal-state-map "/" 'swiper)
 
-;; Somehow previous and next need to be swapped here.
-(define-key evil-motion-state-map "n" 'evil-search-previous)
-(define-key evil-motion-state-map "N" 'evil-search-next)
+;; Somehow, sometimes? previous and next need to be swapped here.
+(define-key evil-motion-state-map "n" 'evil-search-next)
+(define-key evil-motion-state-map "N" 'evil-search-previous)
 
 (use-package hydra)
 
