@@ -24,6 +24,8 @@
 
 (setq-default evil-kill-on-visual-paste nil)
 
+(setq evil-want-keybinding nil)
+
 (use-package unfill)
 
 (use-package undo-tree
@@ -39,6 +41,10 @@
     (exec-path-from-shell-copy-envs '("LANG" "LC_ALL" "LC_CTYPES")))
   (setq exec-path (append exec-path '("/home/linuxbrew/.linuxbrew/bin/" "/home/linuxbrew/.linuxbrew/sbin")))
 (exec-path-from-shell-initialize)
+
+(global-auto-revert-mode t)
+
+(setq ad-redefinition-action 'accept)
 
 (use-package writeroom-mode
   :custom
@@ -99,16 +105,30 @@
   (mk/split-to-shell)
   (delete-other-windows))
 
-(use-package doom-themes
-  :ensure t
-  :config
-  ;; Global settings (defaults)
-  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-        doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-tomorrow-day t)
+(defun mk/reload-modus-config ()
+  (setq modus-themes-region '(bg-only))
+  (setq modus-themes-bold-constructs t)
+  (setq modus-themes-italic-constructs t)
+  (setq modus-themes-syntax '(faint))
+  (setq modus-themes-headings
+    '((1 . (overline background 1.3))
+      (2 . (background 1.2))
+      (3 . (bold 1.1))
+      (t . (1.05))))
+  (setq modus-themes-scale-headings t)
+  (setq modus-themes-org-blocks 'tinted-background)
+  (load-theme 'modus-operandi t))
 
-  ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config))
+(use-package modus-themes
+  :init (mk/reload-modus-config)
+  :hook (org-mode . mk/reload-modus-config))
+
+(defun minibuffer-bg ()
+   (set (make-local-variable 'face-remapping-alist)
+      (pcase (modus-themes--current-theme)
+         ('modus-operandi '((default :background "#f8f8f8")))
+         ('modus-vivendi '((default :background "#323232"))))))
+(add-hook 'minibuffer-setup-hook 'minibuffer-bg)
 
 (set-face-attribute 'default nil
   :family "Roboto Mono"
@@ -249,7 +269,12 @@
   :after lsp-mode
   :hook (lsp-mode . (lambda ()
            (setq company-backend 'company-lsp)
-           (company-mode))))
+           (company-mode)))
+  :config
+  ;; Display completions after entering 2 characters
+  (setq company-minimum-prefix-length 2)
+  ;; Merge several company backends.
+  (add-to-list 'company-backends '(company-capf :with company-ispell company-lsp company-dabbrev :separate)))
 
 (use-package smartparens
   :config
@@ -376,6 +401,33 @@
 (setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin/"))
 (setq exec-path (append exec-path '("/Library/TeX/texbin/")))
 
+(defvar my-LaTeX-no-autofill-environments
+  '("equation" "equation*" "align" "align*")
+  "A list of LaTeX environment names in which `auto-fill-mode' should be inhibited.")
+
+(defun my-LaTeX-auto-fill-function ()
+  "This function checks whether point is currently inside one of
+the LaTeX environments listed in
+`my-LaTeX-no-autofill-environments'. If so, it inhibits automatic
+filling of the current paragraph."
+  (let ((do-auto-fill t)
+        (current-environment "")
+        (level 0))
+    (while (and do-auto-fill (not (string= current-environment "document")))
+      (setq level (1+ level)
+            current-environment (LaTeX-current-environment level)
+            do-auto-fill (not (member current-environment my-LaTeX-no-autofill-environments))))
+    (when do-auto-fill
+      (do-auto-fill))))
+
+(defun my-LaTeX-setup-auto-fill ()
+  "This function turns on auto-fill-mode and sets the function
+used to fill a paragraph to `my-LaTeX-auto-fill-function'."
+  (auto-fill-mode)
+  (setq auto-fill-function 'my-LaTeX-auto-fill-function))
+
+(add-hook 'LaTeX-mode-hook 'my-LaTeX-setup-auto-fill)
+
 (setq TeX-error-overview-open-after-TeX-run t)
 
 (setq TeX-source-correlate-mode t)
@@ -383,7 +435,6 @@
 (setq TeX-source-correlate-method 'synctex)
 
 (add-hook 'TeX-mode-hook (lambda ()
-                           (lsp-ui-doc-mode -1)
                            (setq fill-column 70)))
 
 (setq sentence-end-double-space t)
@@ -426,13 +477,17 @@
                               (display-line-numbers-mode)
                               (setq display-line-numbers 'relative)))
 
-(add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+;; Fixes an issue where reftex won't search/find the bib-file initially.
+(add-hook 'TeX-mode-hook (lambda ()
+   (turn-on-reftex)
+   (reftex-parse-all)))
 
 (setq reftex-plug-into-AUCTeX t)
 
 (setq reftex-external-file-finders
       '(("tex" . "kpsewhich -format=.tex %f")
         ("bib" . "kpsewhich -format=.bib %f")))
+(setq reftex-use-external-file-finders t)
 
 (setq reftex-format-cite-function 
   '(lambda (key fmt)
@@ -449,7 +504,8 @@
   (setq auctex-latexmk-inherit-TeX-PDF-mode t)
   (auctex-latexmk-setup)
   (setq TeX-command-default "LatexMk")
-  (setq latex-build-command "LatexMk"))
+  (setq latex-build-command "LatexMk")
+  (setq LaTeX-electric-left-right-brace t)) ; Enable left/right auto-complete
 
 (defun latex/build ()
   (interactive)
@@ -472,8 +528,18 @@
 (defun latex/font-oblique () (interactive) (TeX-font nil ?\C-s))
 (defun latex/font-upright () (interactive) (TeX-font nil ?\C-u))
 
-(straight-use-package 'lsp-mode)
-(straight-use-package 'lsp-ui)
+(use-package lsp-mode
+  :ensure t
+  :defer t
+  :init
+  (setq lsp-keep-workspace-alive nil
+        lsp-signature-doc-lines 5
+        ;; lsp-idle-delay 1
+        lsp-prefer-capf t)
+  :config
+  (advice-add #'lsp--auto-configure :override #'ignore))
+
+(use-package lsp-ui)
 (straight-use-package 'lsp-ivy)
 
 (use-package yasnippet
@@ -551,7 +617,9 @@
 (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 (add-to-list 'org-structure-template-alist '("py" . "src python"))
 (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+(add-to-list 'org-structure-template-alist '("tex" . "src latex"))
 (add-to-list 'org-structure-template-alist '("ein" . "src ein-python :session localhost"))
+(add-to-list 'org-structure-template-alist '("r" . "src R :session :exports both results output org"))
 
 (defun org-todo-list-LATER ()
   (interactive)
@@ -630,7 +698,8 @@
   'org-babel-load-languages
     '((emacs-lisp . t)
       (python . t)
-      (ein . t)))
+      (ein . t)
+      (R . t)))
 
 (setq org-confirm-babel-evaluate nil)
 
@@ -717,6 +786,10 @@
 
 (define-key evil-normal-state-map "/" 'swiper)
 
+;; Somehow, sometimes? previous and next need to be swapped here.
+(define-key evil-motion-state-map "n" 'evil-search-next)
+(define-key evil-motion-state-map "N" 'evil-search-previous)
+
 (use-package hydra)
 
 (use-package dash)
@@ -732,6 +805,8 @@
   "<escape>" 'abort-recursive-edit
   "DEL"      'exit-recursive-edit
 )
+
+(define-key company-mode-map (kbd "<tab>") 'completion-at-point)
 
 (leader-set-keys
   "a" '(:ignore t :wk "applications")
@@ -805,6 +880,7 @@
 (leader-set-keys
   "h" '(:ignore t :wk "hel")
   "hv" 'helpful-variable
+  "hk" 'helpful-key
   "hf" 'helpful-function
   "ht" 'helpful-at-point
 )
@@ -950,7 +1026,7 @@
 
   (leader-set-keys
     "T" '(:ignore t :wk "Theme")
-    "Ts" 'mk/doom-toggle-theme
+    "Ts" 'modus-themes-toggle
   )
 
 (leader-set-keys
