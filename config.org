@@ -279,7 +279,7 @@ Set the default font for everything
 
 #+begin_src emacs-lisp
 (set-face-attribute 'default nil
-  :family "Roboto Mono"
+  :family "Noto Mono"
   :height 140
   :weight 'medium
   :width 'normal)

@@ -131,7 +131,7 @@
 (add-hook 'minibuffer-setup-hook 'minibuffer-bg)
 
 (set-face-attribute 'default nil
-  :family "Roboto Mono"
+  :family "Noto Mono"
   :height 140
   :weight 'medium
   :width 'normal)
