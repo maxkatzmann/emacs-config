@@ -208,6 +208,23 @@ Alternative interface for M-x.
 (setq company-idle-delay 0)
 #+end_src
 
+Autocomplete / adjust parentheses.
+#+begin_src emacs-lisp
+(use-package smartparens
+  :config
+  (sp-pair "$" "$")
+  (smartparens-global-mode t))
+#+end_src
+
+* Files
+
+Use dirvish as a dired alternative.
+#+begin_src emacs-lisp
+(use-package dirvish
+  :config
+  (dirvish-override-dired-mode))
+#+end_src
+
 * Git
 Use magit
 #+begin_src emacs-lisp
@@ -242,10 +259,12 @@ Display diff indicators in the gutter.
 
 ** Bibtex
 
-Utilize consult to find bibtex entries.
+Use citar to insert citations from the bib-file.
 #+begin_src emacs-lisp
-(straight-use-package '(consult-bibtex :host github
-                                       :repo "mohkale/consult-bibtex"))
+(use-package citar
+  :bind (("C-c b" . citar-insert-citation)
+         :map minibuffer-local-map
+         ("M-b" . citar-insert-preset)))
 #+end_src
 
 We use a custom function for Bibtex key generation.
@@ -309,19 +328,6 @@ Tell RefTeX where it should look for bib files.
       '(("tex" . "kpsewhich -format=.tex %f")
         ("bib" . "kpsewhich -format=.bib %f")))
 (setq reftex-use-external-file-finders t)
-#+end_src
-
-Automatically include a tilde `~` before a citation.
-#+begin_src emacs-lisp
-(setq reftex-format-cite-function 
-  '(lambda (key fmt)
-     (let ((cite (replace-regexp-in-string "%l" key fmt)))
-       (if (or (= ?~ (string-to-char fmt))
-               (member (preceding-char) '(?\ ?\t ?\n ?~ ?{ ?,))
-               (member (following-char) '(?} ))
-     )
-           cite
-         (concat "~" cite)))))
 #+end_src
 
 ** Latex
@@ -389,6 +395,19 @@ Functions to change latex font environments (bold, emphasis, etc.)
 (defun latex/font-serif () (interactive) (TeX-font nil ?\C-r))
 (defun latex/font-oblique () (interactive) (TeX-font nil ?\C-s))
 (defun latex/font-upright () (interactive) (TeX-font nil ?\C-u))
+#+end_src
+
+Use Skim for latex previews
+#+begin_src emacs-lisp
+(setq TeX-view-program-list
+      '(("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")))
+(setq TeX-view-program-selection '((output-pdf "Skim")))
+#+end_src
+
+In latex we want to adjust the fill-column.
+#+begin_src emacs-lisp
+(add-hook 'TeX-mode-hook (lambda ()
+                           (setq fill-column 70)))
 #+end_src
 
 ** Org
@@ -561,6 +580,20 @@ Use evil throughout various tools in emacs.
   (evil-collection-init))
 #+end_src
 
+Swap expressions using evil keybindings.
+#+begin_src emacs-lisp
+(use-package evil-exchange
+  :config
+  (evil-exchange-install))
+#+end_src
+
+Use evil-matchit to jump between tags (e.g. begin/end in Latex)
+#+begin_src emacs-lisp
+(use-package evil-matchit
+  :init
+  (global-evil-matchit-mode 1))
+#+end_src
+
 ** Miscellaneous
 Display currently available keybindings.
 #+begin_src emacs-lisp
@@ -591,12 +624,14 @@ Packages related to getting a spacemacs-like setup.
 #+begin_src emacs-lisp
 (leader-set-keys
   "TAB" '(switch-to-last-buffer+ :wk "last-buffer")
-  "SPC" '(counsel-M-x :wk "M-x")
   "SPC" 'execute-extended-command
   "<escape>" 'abort-recursive-edit
   "DEL" 'exit-recursive-edit
-  "/" 'consult-line
 )
+#+end_src
+
+#+begin_src emacs-lisp
+(define-key evil-normal-state-map "/" 'consult-line)
 #+end_src
 
 *** Bibtex
@@ -729,7 +764,7 @@ Function to find the ~config.org~ file.
 (leader-set-keys-for-major-mode 'latex-mode "-" 'TeX-recenter-output-buffer)
 (leader-set-keys-for-major-mode 'latex-mode "r" 'reftex-reference)
 (leader-set-keys-for-major-mode 'latex-mode "s" 'LaTeX-section)
-(leader-set-keys-for-major-mode 'latex-mode "C" 'ivy-bibtex-with-local-bibliography)
+(leader-set-keys-for-major-mode 'latex-mode "C" 'citar-insert-citation)
 (leader-set-keys-for-major-mode 'latex-mode "xb" 'latex/font-bold)
 (leader-set-keys-for-major-mode 'latex-mode "xe" 'latex/font-emphasis)
 (leader-set-keys-for-major-mode 'latex-mode "xi" 'latex/font-italic)

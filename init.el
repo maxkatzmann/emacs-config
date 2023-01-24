@@ -125,6 +125,15 @@
 (setq company-dabbrev-downcase 0)
 (setq company-idle-delay 0)
 
+(use-package smartparens
+  :config
+  (sp-pair "$" "$")
+  (smartparens-global-mode t))
+
+(use-package dirvish
+  :config
+  (dirvish-override-dired-mode))
+
 (use-package magit)
 
 (use-package magit-delta)
@@ -145,8 +154,10 @@
   (set-face-foreground 'git-gutter-fr:added    "sea green")
   (set-face-foreground 'git-gutter-fr:deleted  "red2"))
 
-(straight-use-package '(consult-bibtex :host github
-                                       :repo "mohkale/consult-bibtex"))
+(use-package citar
+  :bind (("C-c b" . citar-insert-citation)
+         :map minibuffer-local-map
+         ("M-b" . citar-insert-preset)))
 
 (require 'cl-lib)
 (setq bibtex-autokey-before-presentation-function
@@ -195,16 +206,6 @@
         ("bib" . "kpsewhich -format=.bib %f")))
 (setq reftex-use-external-file-finders t)
 
-(setq reftex-format-cite-function 
-  '(lambda (key fmt)
-     (let ((cite (replace-regexp-in-string "%l" key fmt)))
-       (if (or (= ?~ (string-to-char fmt))
-               (member (preceding-char) '(?\ ?\t ?\n ?~ ?{ ?,))
-               (member (following-char) '(?} ))
-     )
-           cite
-         (concat "~" cite)))))
-
 (straight-use-package 'auctex)
 
 (setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin/"))
@@ -249,6 +250,13 @@
 (defun latex/font-serif () (interactive) (TeX-font nil ?\C-r))
 (defun latex/font-oblique () (interactive) (TeX-font nil ?\C-s))
 (defun latex/font-upright () (interactive) (TeX-font nil ?\C-u))
+
+(setq TeX-view-program-list
+      '(("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")))
+(setq TeX-view-program-selection '((output-pdf "Skim")))
+
+(add-hook 'TeX-mode-hook (lambda ()
+                           (setq fill-column 70)))
 
 (use-package org)
 
@@ -351,6 +359,14 @@
   :config
   (evil-collection-init))
 
+(use-package evil-exchange
+  :config
+  (evil-exchange-install))
+
+(use-package evil-matchit
+  :init
+  (global-evil-matchit-mode 1))
+
 (use-package which-key
   :config
   (which-key-setup-minibuffer)
@@ -367,12 +383,12 @@
 
 (leader-set-keys
   "TAB" '(switch-to-last-buffer+ :wk "last-buffer")
-  "SPC" '(counsel-M-x :wk "M-x")
   "SPC" 'execute-extended-command
   "<escape>" 'abort-recursive-edit
   "DEL" 'exit-recursive-edit
-  "/" 'consult-line
 )
+
+(define-key evil-normal-state-map "/" 'consult-line)
 
 (leader-set-keys-for-major-mode 'bibtex-mode "s" 'org-ref-sort-bibtex-entry)
 (leader-set-keys-for-major-mode 'bibtex-mode "c" 'bibtex-clean-entry)
@@ -462,7 +478,7 @@
 (leader-set-keys-for-major-mode 'latex-mode "-" 'TeX-recenter-output-buffer)
 (leader-set-keys-for-major-mode 'latex-mode "r" 'reftex-reference)
 (leader-set-keys-for-major-mode 'latex-mode "s" 'LaTeX-section)
-(leader-set-keys-for-major-mode 'latex-mode "C" 'ivy-bibtex-with-local-bibliography)
+(leader-set-keys-for-major-mode 'latex-mode "C" 'citar-insert-citation)
 (leader-set-keys-for-major-mode 'latex-mode "xb" 'latex/font-bold)
 (leader-set-keys-for-major-mode 'latex-mode "xe" 'latex/font-emphasis)
 (leader-set-keys-for-major-mode 'latex-mode "xi" 'latex/font-italic)
