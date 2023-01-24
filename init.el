@@ -327,6 +327,10 @@
 
 (setq-default evil-kill-on-visual-paste nil)
 
+(recentf-mode 1)
+(setq recentf-max-menu-items 25)
+(setq recentf-max-saved-items 25)
+
 (setq mac-option-modifier 'alt)
 (setq mac-command-modifier 'meta)
 (global-set-key (kbd "A-<backspace>") 'backward-kill-word)

@@ -520,6 +520,13 @@ Don't store cut content in clipboard.
 (setq-default evil-kill-on-visual-paste nil)
 #+end_src
 
+** Files
+Include recent files when switching between buffers.
+#+begin_src emacs-lisp
+(recentf-mode 1)
+(setq recentf-max-menu-items 25)
+(setq recentf-max-saved-items 25)
+#+end_src
 * Keybindings
 
 #+begin_src emacs-lisp
