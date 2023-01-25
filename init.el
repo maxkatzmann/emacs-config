@@ -122,8 +122,27 @@
 
 (use-package company)
 (add-hook 'after-init-hook 'global-company-mode)
-(setq company-dabbrev-downcase 0)
-(setq company-idle-delay 0)
+(setq company-idle-delay 0.2)
+(setq company-dabbrev-downcase nil)
+
+(defun mk/company-backends-hook ()
+  (interactive)
+  (message "mk/ Hooking backends...")
+  (setq company-backends
+  '((company-dabbrev
+     company-dabbrev-code
+     company-capf
+     company-files
+     company-keywords
+     company-clang
+     company-gtags
+     company-etags
+     company-semantic
+     company-bbdb
+     :separate))))
+(add-hook 'text-mode-hook 'mk/company-backends-hook)
+(add-hook 'prog-mode-hook 'mk/company-backends-hook)
+(add-hook 'eglot-managed-mode-hook (lambda () (mk/company-backends-hook)))
 
 (use-package smartparens
   :config
@@ -213,15 +232,6 @@
 
 (add-hook 'TeX-mode-hook 'eglot-ensure)
 
-(add-hook 'TeX-mode-hook (lambda ()
-   (turn-on-reftex)
-   (reftex-parse-all)))
-(setq reftex-plug-into-AUCTeX t)
-(setq reftex-external-file-finders
-      '(("tex" . "kpsewhich -format=.tex %f")
-        ("bib" . "kpsewhich -format=.bib %f")))
-(setq reftex-use-external-file-finders t)
-
 (use-package auctex-latexmk
   :config
   (setq auctex-latexmk-inherit-TeX-PDF-mode t)
@@ -251,12 +261,21 @@
 (defun latex/font-oblique () (interactive) (TeX-font nil ?\C-s))
 (defun latex/font-upright () (interactive) (TeX-font nil ?\C-u))
 
+(setq TeX-source-correlate-mode t)
+(setq TeX-source-correlate-start-server t)
+(setq TeX-source-correlate-method 'synctex)
+
 (setq TeX-view-program-list
       '(("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")))
 (setq TeX-view-program-selection '((output-pdf "Skim")))
 
 (add-hook 'TeX-mode-hook (lambda ()
                            (setq fill-column 70)))
+
+(use-package markdown-mode
+  :ensure t
+  :mode ("README\\.md\\'" . gfm-mode)
+  :init (setq markdown-command "multimarkdown"))
 
 (use-package org)
 
@@ -339,6 +358,8 @@
 (setq recentf-max-menu-items 25)
 (setq recentf-max-saved-items 25)
 
+(use-package rg)
+
 (setq mac-option-modifier 'alt)
 (setq mac-command-modifier 'meta)
 (global-set-key (kbd "A-<backspace>") 'backward-kill-word)
@@ -386,6 +407,7 @@
   "SPC" 'execute-extended-command
   "<escape>" 'abort-recursive-edit
   "DEL" 'exit-recursive-edit
+  "/" 'consult-ripgrep
 )
 
 (define-key evil-normal-state-map "/" 'consult-line)
@@ -479,6 +501,7 @@
 (leader-set-keys-for-major-mode 'latex-mode "r" 'reftex-reference)
 (leader-set-keys-for-major-mode 'latex-mode "s" 'LaTeX-section)
 (leader-set-keys-for-major-mode 'latex-mode "C" 'citar-insert-citation)
+(leader-set-keys-for-major-mode 'latex-mode "R" 'reftex-toc)
 (leader-set-keys-for-major-mode 'latex-mode "xb" 'latex/font-bold)
 (leader-set-keys-for-major-mode 'latex-mode "xe" 'latex/font-emphasis)
 (leader-set-keys-for-major-mode 'latex-mode "xi" 'latex/font-italic)

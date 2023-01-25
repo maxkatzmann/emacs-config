@@ -204,8 +204,30 @@ Alternative interface for M-x.
 #+begin_src emacs-lisp
 (use-package company)
 (add-hook 'after-init-hook 'global-company-mode)
-(setq company-dabbrev-downcase 0)
-(setq company-idle-delay 0)
+(setq company-idle-delay 0.2)
+(setq company-dabbrev-downcase nil)
+#+end_src
+
+Merge company backends
+#+begin_src emacs-lisp
+(defun mk/company-backends-hook ()
+  (interactive)
+  (message "mk/ Hooking backends...")
+  (setq company-backends
+  '((company-dabbrev
+     company-dabbrev-code
+     company-capf
+     company-files
+     company-keywords
+     company-clang
+     company-gtags
+     company-etags
+     company-semantic
+     company-bbdb
+     :separate))))
+(add-hook 'text-mode-hook 'mk/company-backends-hook)
+(add-hook 'prog-mode-hook 'mk/company-backends-hook)
+(add-hook 'eglot-managed-mode-hook (lambda () (mk/company-backends-hook)))
 #+end_src
 
 Autocomplete / adjust parentheses.
@@ -347,18 +369,6 @@ Enable LSP in Latex
 (add-hook 'TeX-mode-hook 'eglot-ensure)
 #+end_src
 
-Fix an issue where reftex won't search/find the bib-file initially.
-#+begin_src emacs-lisp
-(add-hook 'TeX-mode-hook (lambda ()
-   (turn-on-reftex)
-   (reftex-parse-all)))
-(setq reftex-plug-into-AUCTeX t)
-(setq reftex-external-file-finders
-      '(("tex" . "kpsewhich -format=.tex %f")
-        ("bib" . "kpsewhich -format=.bib %f")))
-(setq reftex-use-external-file-finders t)
-#+end_src
-
 Use LatexMk
 #+begin_src emacs-lisp
 (use-package auctex-latexmk
@@ -397,6 +407,13 @@ Functions to change latex font environments (bold, emphasis, etc.)
 (defun latex/font-upright () (interactive) (TeX-font nil ?\C-u))
 #+end_src
 
+Setup synctex
+#+begin_src emacs-lisp
+(setq TeX-source-correlate-mode t)
+(setq TeX-source-correlate-start-server t)
+(setq TeX-source-correlate-method 'synctex)
+#+end_src
+
 Use Skim for latex previews
 #+begin_src emacs-lisp
 (setq TeX-view-program-list
@@ -410,6 +427,13 @@ In latex we want to adjust the fill-column.
                            (setq fill-column 70)))
 #+end_src
 
+** Markdown
+#+begin_src emacs-lisp
+(use-package markdown-mode
+  :ensure t
+  :mode ("README\\.md\\'" . gfm-mode)
+  :init (setq markdown-command "multimarkdown"))
+#+end_src
 ** Org
 #+begin_src emacs-lisp
 (use-package org)
@@ -546,6 +570,11 @@ Include recent files when switching between buffers.
 (setq recentf-max-menu-items 25)
 (setq recentf-max-saved-items 25)
 #+end_src
+** Search
+Use ripgrep for search!
+#+begin_src emacs-lisp
+(use-package rg)
+#+end_src
 * Keybindings
 
 #+begin_src emacs-lisp
@@ -627,6 +656,7 @@ Packages related to getting a spacemacs-like setup.
   "SPC" 'execute-extended-command
   "<escape>" 'abort-recursive-edit
   "DEL" 'exit-recursive-edit
+  "/" 'consult-ripgrep
 )
 #+end_src
 
@@ -765,6 +795,7 @@ Function to find the ~config.org~ file.
 (leader-set-keys-for-major-mode 'latex-mode "r" 'reftex-reference)
 (leader-set-keys-for-major-mode 'latex-mode "s" 'LaTeX-section)
 (leader-set-keys-for-major-mode 'latex-mode "C" 'citar-insert-citation)
+(leader-set-keys-for-major-mode 'latex-mode "R" 'reftex-toc)
 (leader-set-keys-for-major-mode 'latex-mode "xb" 'latex/font-bold)
 (leader-set-keys-for-major-mode 'latex-mode "xe" 'latex/font-emphasis)
 (leader-set-keys-for-major-mode 'latex-mode "xi" 'latex/font-italic)
