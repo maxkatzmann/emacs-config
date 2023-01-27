@@ -149,6 +149,11 @@ Enable line highlighting
 (use-package consult)
 #+end_src
 
+Find symbols in the whole workspace.
+#+begin_src emacs-lisp
+(use-package consult-eglot)
+#+end_src
+
 For fuzzy matching in searches.
 #+begin_src emacs-lisp
 (use-package orderless
@@ -238,6 +243,23 @@ Autocomplete / adjust parentheses.
   (smartparens-global-mode t))
 #+end_src
 
+Spelling
+#+begin_src emacs-lisp
+(use-package flyspell-correct
+  :after flyspell)
+#+end_src
+
+Use consult to correct spellings.
+#+begin_src emacs-lisp
+(use-package consult-flyspell
+  :straight (consult-flyspell :type git :host gitlab :repo "OlMon/consult-flyspell" :branch "master")
+  :config
+  ;; default settings
+  (setq consult-flyspell-select-function 'flyspell-correct-at-point
+        consult-flyspell-set-point-after-word t
+        consult-flyspell-always-check-buffer nil))
+#+end_src
+
 * Files
 
 Use dirvish as a dired alternative.
@@ -245,6 +267,24 @@ Use dirvish as a dired alternative.
 (use-package dirvish
   :config
   (dirvish-override-dired-mode))
+#+end_src
+
+Allow for hiding dot-files
+#+begin_src emacs-lisp
+(use-package dired-hide-dotfiles
+  :hook (dired-mode . dired-hide-dotfiles-mode)
+  :config
+  (evil-collection-define-key 'normal 'dired-mode-map
+  "H" 'dired-hide-dotfiles-mode
+  "h" 'dired-up-directory
+  "l" 'dired-find-file
+  (kbd "SPC") 'counsel-M-x))
+#+end_src
+
+Store backups file in the .emacs.d directory and not the one that the
+file is in.
+#+begin_src emacs-lisp
+(setq backup-directory-alist `(("." . "~/.emacs.d/backups")))
 #+end_src
 
 * Git
@@ -331,31 +371,11 @@ Enable line numbers in Bibtex mode by default.
                               (setq display-line-numbers 'relative)))
 #+end_src
 
-Enable Reftex in AUCTeX and fix an issue where reftex won't
-search/find the bib-file initially.
-#+begin_src emacs-lisp
-(add-hook 'TeX-mode-hook (lambda ()
-   (turn-on-reftex)
-   (reftex-parse-all)))
-#+end_src
-
-Enable a nice interface between RefTeX and AUCTeX
-#+begin_src emacs-lisp
-(setq reftex-plug-into-AUCTeX t)
-#+end_src
-
-Tell RefTeX where it should look for bib files.
-#+begin_src emacs-lisp
-(setq reftex-external-file-finders
-      '(("tex" . "kpsewhich -format=.tex %f")
-        ("bib" . "kpsewhich -format=.bib %f")))
-(setq reftex-use-external-file-finders t)
-#+end_src
-
 ** Latex
 
 #+begin_src emacs-lisp
-(straight-use-package 'auctex)
+(use-package tex
+  :straight auctex)
 #+end_src
 
 Make sure we find the correct TeX binaries.
@@ -408,7 +428,7 @@ Functions to change latex font environments (bold, emphasis, etc.)
 #+end_src
 
 Setup synctex
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp 
 (setq TeX-source-correlate-mode t)
 (setq TeX-source-correlate-start-server t)
 (setq TeX-source-correlate-method 'synctex)
@@ -623,6 +643,14 @@ Use evil-matchit to jump between tags (e.g. begin/end in Latex)
   (global-evil-matchit-mode 1))
 #+end_src
 
+Use evil-surround to be able to surround selections with characters.
+#+begin_src emacs-lisp
+(use-package evil-surround
+  :config
+  (global-evil-surround-mode 1)
+  (evil-define-key 'visual global-map "s" 'evil-surround-region))
+#+end_src
+
 ** Miscellaneous
 Display currently available keybindings.
 #+begin_src emacs-lisp
@@ -780,6 +808,7 @@ Function to find the ~config.org~ file.
 (leader-set-keys
   "j" '(:ignore t :wk "jump")
   "ji" 'consult-imenu
+  "jI" 'consult-eglot
 )
 #+end_src
 
@@ -819,7 +848,7 @@ Function to find the ~config.org~ file.
 
 *** Shell
 #+begin_src emacs-lisp
-(leader-set-keys-for-major-mode 'shell-mode "h" 'counsel-shell-history)
+(leader-set-keys-for-major-mode 'shell-mode "h" 'consult-history)
 #+end_src
 
 *** Spelling
@@ -828,6 +857,7 @@ Function to find the ~config.org~ file.
   "S" '(:ignore t :wk "Spelling")
   "Sb" 'flyspell-buffer
   "Sc" 'flyspell-correct-wrapper
+  "SC" 'consult-flyspell
   "Sn" 'flyspell-goto-next-error
   "Sd" 'ispell-change-dictionary
 )
@@ -868,6 +898,7 @@ Function to find the ~config.org~ file.
   "t" '(:ignore t :wk "toggles")
   "ta" 'auto-fill-mode
   "tl" 'toggle-truncate-lines
+  "tL" 'display-line-numbers-mode
 )
 #+end_src
 

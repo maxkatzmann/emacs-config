@@ -80,6 +80,8 @@
 
 (use-package consult)
 
+(use-package consult-eglot)
+
 (use-package orderless
   :ensure t
   :custom
@@ -149,9 +151,31 @@
   (sp-pair "$" "$")
   (smartparens-global-mode t))
 
+(use-package flyspell-correct
+  :after flyspell)
+
+(use-package consult-flyspell
+  :straight (consult-flyspell :type git :host gitlab :repo "OlMon/consult-flyspell" :branch "master")
+  :config
+  ;; default settings
+  (setq consult-flyspell-select-function 'flyspell-correct-at-point
+        consult-flyspell-set-point-after-word t
+        consult-flyspell-always-check-buffer nil))
+
 (use-package dirvish
   :config
   (dirvish-override-dired-mode))
+
+(use-package dired-hide-dotfiles
+  :hook (dired-mode . dired-hide-dotfiles-mode)
+  :config
+  (evil-collection-define-key 'normal 'dired-mode-map
+  "H" 'dired-hide-dotfiles-mode
+  "h" 'dired-up-directory
+  "l" 'dired-find-file
+  (kbd "SPC") 'counsel-M-x))
+
+(setq backup-directory-alist `(("." . "~/.emacs.d/backups")))
 
 (use-package magit)
 
@@ -214,18 +238,8 @@
                               (display-line-numbers-mode)
                               (setq display-line-numbers 'relative)))
 
-(add-hook 'TeX-mode-hook (lambda ()
-   (turn-on-reftex)
-   (reftex-parse-all)))
-
-(setq reftex-plug-into-AUCTeX t)
-
-(setq reftex-external-file-finders
-      '(("tex" . "kpsewhich -format=.tex %f")
-        ("bib" . "kpsewhich -format=.bib %f")))
-(setq reftex-use-external-file-finders t)
-
-(straight-use-package 'auctex)
+(use-package tex
+  :straight auctex)
 
 (setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin/"))
 (setq exec-path (append exec-path '("/Library/TeX/texbin/")))
@@ -388,6 +402,11 @@
   :init
   (global-evil-matchit-mode 1))
 
+(use-package evil-surround
+  :config
+  (global-evil-surround-mode 1)
+  (evil-define-key 'visual global-map "s" 'evil-surround-region))
+
 (use-package which-key
   :config
   (which-key-setup-minibuffer)
@@ -489,6 +508,7 @@
 (leader-set-keys
   "j" '(:ignore t :wk "jump")
   "ji" 'consult-imenu
+  "jI" 'consult-eglot
 )
 
 (leader-set-keys-for-major-mode 'latex-mode "c" 'latex/build)
@@ -516,12 +536,13 @@
 (leader-set-keys-for-major-mode 'python-mode "c" 'compile)
 (leader-set-keys-for-major-mode 'python-mode "=" 'yapfify-buffer)
 
-(leader-set-keys-for-major-mode 'shell-mode "h" 'counsel-shell-history)
+(leader-set-keys-for-major-mode 'shell-mode "h" 'consult-history)
 
 (leader-set-keys
   "S" '(:ignore t :wk "Spelling")
   "Sb" 'flyspell-buffer
   "Sc" 'flyspell-correct-wrapper
+  "SC" 'consult-flyspell
   "Sn" 'flyspell-goto-next-error
   "Sd" 'ispell-change-dictionary
 )
@@ -550,6 +571,7 @@
   "t" '(:ignore t :wk "toggles")
   "ta" 'auto-fill-mode
   "tl" 'toggle-truncate-lines
+  "tL" 'display-line-numbers-mode
 )
 
 (leader-set-keys
