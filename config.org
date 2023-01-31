@@ -250,6 +250,15 @@ Merge company backends
 (add-hook 'eglot-managed-mode-hook (lambda () (mk/company-backends-hook)))
 #+end_src
 
+Make sure no completion occurs on empty prefixes.
+#+begin_src emacs-lisp
+(defun mk/company-clear-on-empty-prefix (candidates)
+  (if (= (length company-prefix) 0)
+    nil
+    candidates))
+(setq company-transformers '(mk/company-clear-on-empty-prefix))
+#+end_src
+
 Autocomplete / adjust parentheses.
 #+begin_src emacs-lisp
 (use-package smartparens

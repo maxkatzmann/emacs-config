@@ -147,6 +147,12 @@
 (add-hook 'prog-mode-hook 'mk/company-backends-hook)
 (add-hook 'eglot-managed-mode-hook (lambda () (mk/company-backends-hook)))
 
+(defun mk/company-clear-on-empty-prefix (candidates)
+  (if (= (length company-prefix) 0)
+    nil
+    candidates))
+(setq company-transformers '(mk/company-clear-on-empty-prefix))
+
 (use-package smartparens
   :config
   (sp-pair "$" "$")
