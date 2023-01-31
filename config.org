@@ -206,11 +206,26 @@ Alternative interface for M-x.
 #+end_src
 
 * Completion: Text/Code
+Cannot use corfu for autocomplete since that does not work nicely with
+our tiling window manager.
+#+begin_src emacs-lisp :tangle no
+(use-package corfu
+  :demand t
+  :custom
+  (corfu-auto t)
+  :config
+  (setq corfu-auto-delay 0)
+  (setq corfu-auto-prefix 1)
+  :init
+  (global-corfu-mode))
+#+end_src
+
 #+begin_src emacs-lisp
-(use-package company)
-(add-hook 'after-init-hook 'global-company-mode)
-(setq company-idle-delay 0.2)
-(setq company-dabbrev-downcase nil)
+  (use-package company)
+  (add-hook 'after-init-hook 'global-company-mode)
+  (setq company-idle-delay 0.2)
+  (setq company-minimum-prefix-length 3)
+  (setq company-dabbrev-downcase nil)
 #+end_src
 
 Merge company backends
@@ -219,11 +234,11 @@ Merge company backends
   (interactive)
   (message "mk/ Hooking backends...")
   (setq company-backends
-  '((company-dabbrev
-     company-dabbrev-code
-     company-capf
+  '((company-capf
      company-files
      company-keywords
+     company-dabbrev-code
+     company-dabbrev
      company-clang
      company-gtags
      company-etags
@@ -378,6 +393,11 @@ Enable line numbers in Bibtex mode by default.
   :straight auctex)
 #+end_src
 
+#+begin_src emacs-lisp
+(straight-use-package
+  '(consult-reftex :type git :host github :repo "karthink/consult-reftex"))
+#+end_src
+
 Make sure we find the correct TeX binaries.
 #+begin_src emacs-lisp
 (setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin/"))
@@ -517,12 +537,23 @@ Use babel to convert this ~config.org~ file into the ~init.el~ file.
 
 Define which LSP providers should be used in which mode.
 #+begin_src emacs-lisp
-(with-eval-after-load 'eglot
-  (add-to-list 'eglot-server-programs
-               '(python-mode . ("pylsp"))))
+(setq eglot-server-programs
+  '((python-mode . ("pylsp"))
+    (latex-mode . ("texlab"))))
 #+end_src
 
 * Windows
+
+Don't spawn new buffers in new windows (e.g. magit, help)
+#+begin_src emacs-lisp
+(use-package current-window-only
+  :straight (current-window-only
+             :type git
+             :host github
+             :repo "FrostyX/current-window-only")
+  :config
+  (current-window-only-mode))
+#+end_src
 
 ** Splitting
 
@@ -821,7 +852,7 @@ Function to find the ~config.org~ file.
 (leader-set-keys-for-major-mode 'latex-mode "e" 'LaTeX-environment)
 (leader-set-keys-for-major-mode 'latex-mode "l" 'TeX-error-overview)
 (leader-set-keys-for-major-mode 'latex-mode "-" 'TeX-recenter-output-buffer)
-(leader-set-keys-for-major-mode 'latex-mode "r" 'reftex-reference)
+(leader-set-keys-for-major-mode 'latex-mode "r" 'consult-reftex-insert-reference)
 (leader-set-keys-for-major-mode 'latex-mode "s" 'LaTeX-section)
 (leader-set-keys-for-major-mode 'latex-mode "C" 'citar-insert-citation)
 (leader-set-keys-for-major-mode 'latex-mode "R" 'reftex-toc)

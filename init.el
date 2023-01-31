@@ -125,17 +125,18 @@
 (use-package company)
 (add-hook 'after-init-hook 'global-company-mode)
 (setq company-idle-delay 0.2)
+(setq company-minimum-prefix-length 3)
 (setq company-dabbrev-downcase nil)
 
 (defun mk/company-backends-hook ()
   (interactive)
   (message "mk/ Hooking backends...")
   (setq company-backends
-  '((company-dabbrev
-     company-dabbrev-code
-     company-capf
+  '((company-capf
      company-files
      company-keywords
+     company-dabbrev-code
+     company-dabbrev
      company-clang
      company-gtags
      company-etags
@@ -241,6 +242,9 @@
 (use-package tex
   :straight auctex)
 
+(straight-use-package
+  '(consult-reftex :type git :host github :repo "karthink/consult-reftex"))
+
 (setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin/"))
 (setq exec-path (append exec-path '("/Library/TeX/texbin/")))
 
@@ -325,9 +329,17 @@
   :init
   (add-hook 'python-mode-hook 'eglot-ensure)) ;; Enable LSP in Python
 
-(with-eval-after-load 'eglot
-  (add-to-list 'eglot-server-programs
-               '(python-mode . ("pylsp"))))
+(setq eglot-server-programs
+  '((python-mode . ("pylsp"))
+    (latex-mode . ("texlab"))))
+
+(use-package current-window-only
+  :straight (current-window-only
+             :type git
+             :host github
+             :repo "FrostyX/current-window-only")
+  :config
+  (current-window-only-mode))
 
 (defun split-and-follow-vertically ()
   (interactive)
@@ -518,7 +530,7 @@
 (leader-set-keys-for-major-mode 'latex-mode "e" 'LaTeX-environment)
 (leader-set-keys-for-major-mode 'latex-mode "l" 'TeX-error-overview)
 (leader-set-keys-for-major-mode 'latex-mode "-" 'TeX-recenter-output-buffer)
-(leader-set-keys-for-major-mode 'latex-mode "r" 'reftex-reference)
+(leader-set-keys-for-major-mode 'latex-mode "r" 'consult-reftex-insert-reference)
 (leader-set-keys-for-major-mode 'latex-mode "s" 'LaTeX-section)
 (leader-set-keys-for-major-mode 'latex-mode "C" 'citar-insert-citation)
 (leader-set-keys-for-major-mode 'latex-mode "R" 'reftex-toc)
