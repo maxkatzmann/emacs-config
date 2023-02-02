@@ -161,11 +161,16 @@
 (use-package flyspell-correct
   :after flyspell)
 
+(add-hook 'text-mode-hook '(flyspell-mode t))
+(add-hook 'prog-mode-hook '(flyspell-mode t))
+
+(setq ispell-dictionary "english")
+
 (use-package consult-flyspell
   :straight (consult-flyspell :type git :host gitlab :repo "OlMon/consult-flyspell" :branch "master")
   :config
   ;; default settings
-  (setq consult-flyspell-select-function 'flyspell-correct-at-point
+  (setq consult-flyspell-correct-function '(lambda () (flyspell-correct-at-point) (consult-flyspell))
         consult-flyspell-set-point-after-word t
         consult-flyspell-always-check-buffer nil))
 
@@ -386,6 +391,35 @@
 
 (setq-default evil-kill-on-visual-paste nil)
 
+(use-package undo-tree
+  :init
+  (global-undo-tree-mode)
+  (evil-set-undo-system 'undo-tree))
+
+(add-hook 'text-mode-hook '(auto-fill-mode t))
+
+(defun mk/replace-char-under-cursor-with-char (new-char)
+  (insert new-char)
+  (delete-char 1))
+
+(defun mk/convert-to-umlaut ()
+  (interactive)
+  (let ((to-replace (string (char-after))))
+    (cond ((string= to-replace "a")
+	   (mk/replace-char-under-cursor-with-char "ä"))
+	  ((string= to-replace "A")
+	   (mk/replace-char-under-cursor-with-char "Ä"))
+	  ((string= to-replace "o")
+	   (mk/replace-char-under-cursor-with-char "ö"))
+	  ((string= to-replace "O")
+	   (mk/replace-char-under-cursor-with-char "Ö"))
+	  ((string= to-replace "u")
+	   (mk/replace-char-under-cursor-with-char "ü"))
+	  ((string= to-replace "U")
+	   (mk/replace-char-under-cursor-with-char "Ü"))
+	  ((string= to-replace "s")
+	   (mk/replace-char-under-cursor-with-char "ß")))))
+
 (recentf-mode 1)
 (setq recentf-max-menu-items 25)
 (setq recentf-max-saved-items 25)
@@ -559,7 +593,7 @@
 (leader-set-keys
   "S" '(:ignore t :wk "Spelling")
   "Sb" 'flyspell-buffer
-  "Sc" 'flyspell-correct-wrapper
+  "Sc" 'flyspell-correct-at-point
   "SC" 'consult-flyspell
   "Sn" 'flyspell-goto-next-error
   "Sd" 'ispell-change-dictionary
@@ -579,7 +613,7 @@
   "xC" 'capitalize-word
   "xL" 'downcase-word
   "xT" 'titlecase-region
-  "xa" 'accent-menu
+  "xa" 'mk/convert-to-umlaut
   "xi" 'hydra-transient-special-characters/body
 )
 
