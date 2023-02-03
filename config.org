@@ -552,6 +552,16 @@ Use babel to convert this ~config.org~ file into the ~init.el~ file.
   (add-hook 'python-mode-hook 'eglot-ensure)) ;; Enable LSP in Python
 #+end_src
 
+
+** Tree Sitter
+Enable tree-sitter wherever possible.
+#+begin_src emacs-lisp
+(use-package treesit-auto
+  :config
+  (setq treesit-auto-install 'prompt)
+  (global-treesit-auto-mode))
+#+end_src
+
 * LSP
 
 Define which LSP providers should be used in which mode.
@@ -637,8 +647,7 @@ Setup redo functionality.
 #+begin_src emacs-lisp
 (use-package undo-tree
   :init
-  (global-undo-tree-mode)
-  (evil-set-undo-system 'undo-tree))
+  (global-undo-tree-mode))
 #+end_src
 
 Enable ~auto-fill~ by default.
@@ -700,7 +709,8 @@ Use ripgrep for search!
   (setq evil-want-keybinding nil) ;; Required for evil-collection
   (setq evil-want-visual-char-semi-exclusive t)
   :config
-  (evil-mode 1))
+  (evil-mode 1)
+  (evil-set-undo-system 'undo-tree))
 #+end_src
 
 Use j/k to jump up and down in the current column, even if lines are

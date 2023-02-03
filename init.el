@@ -340,6 +340,11 @@
   :init
   (add-hook 'python-mode-hook 'eglot-ensure)) ;; Enable LSP in Python
 
+(use-package treesit-auto
+  :config
+  (setq treesit-auto-install 'prompt)
+  (global-treesit-auto-mode))
+
 (setq eglot-server-programs
   '((python-mode . ("pylsp"))
     (latex-mode . ("texlab"))))
@@ -393,8 +398,7 @@
 
 (use-package undo-tree
   :init
-  (global-undo-tree-mode)
-  (evil-set-undo-system 'undo-tree))
+  (global-undo-tree-mode))
 
 (add-hook 'text-mode-hook 'turn-on-auto-fill)
 (setq-default auto-fill-function 'do-auto-fill)
@@ -437,7 +441,8 @@
   (setq evil-want-keybinding nil) ;; Required for evil-collection
   (setq evil-want-visual-char-semi-exclusive t)
   :config
-  (evil-mode 1))
+  (evil-mode 1)
+  (evil-set-undo-system 'undo-tree))
 
 (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
 (define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line)
