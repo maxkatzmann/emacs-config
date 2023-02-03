@@ -274,8 +274,8 @@ Spelling
 #+end_src
 
 #+begin_src emacs-lisp
-(add-hook 'text-mode-hook '(flyspell-mode t))
-(add-hook 'prog-mode-hook '(flyspell-mode t))
+(add-hook 'text-mode-hook 'flyspell-mode)
+(add-hook 'prog-mode-hook 'flyspell-prog-mode)
 #+end_src
 
 Make sure to use english dictionary by default.
@@ -643,7 +643,8 @@ Setup redo functionality.
 
 Enable ~auto-fill~ by default.
 #+begin_src emacs-lisp
-(add-hook 'text-mode-hook '(auto-fill-mode t))
+(add-hook 'text-mode-hook 'turn-on-auto-fill)
+(setq-default auto-fill-function 'do-auto-fill)
 #+end_src
 
 Easily convert a char to the corresponding umlaut.

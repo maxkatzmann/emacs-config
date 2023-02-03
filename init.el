@@ -161,8 +161,8 @@
 (use-package flyspell-correct
   :after flyspell)
 
-(add-hook 'text-mode-hook '(flyspell-mode t))
-(add-hook 'prog-mode-hook '(flyspell-mode t))
+(add-hook 'text-mode-hook 'flyspell-mode)
+(add-hook 'prog-mode-hook 'flyspell-prog-mode)
 
 (setq ispell-dictionary "english")
 
@@ -396,7 +396,8 @@
   (global-undo-tree-mode)
   (evil-set-undo-system 'undo-tree))
 
-(add-hook 'text-mode-hook '(auto-fill-mode t))
+(add-hook 'text-mode-hook 'turn-on-auto-fill)
+(setq-default auto-fill-function 'do-auto-fill)
 
 (defun mk/replace-char-under-cursor-with-char (new-char)
   (insert new-char)
