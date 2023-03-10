@@ -250,8 +250,11 @@
                               (display-line-numbers-mode)
                               (setq display-line-numbers 'relative)))
 
+(use-package org-ref)
+
 (use-package tex
-  :straight auctex)
+  :straight auctex
+  :mode(("lua_.*" . LaTeX-mode)))
 
 (straight-use-package
   '(consult-reftex :type git :host github :repo "karthink/consult-reftex"))
@@ -300,6 +303,29 @@
 
 (add-hook 'TeX-mode-hook (lambda ()
                            (setq fill-column 70)))
+
+(defun mk/align-latex-table ()
+  (interactive)
+  (unless (string= (LaTeX-current-environment) "document")
+    (let ((s (make-marker))
+          (e (make-marker)))
+      (set-marker s (save-excursion
+                      (LaTeX-find-matching-begin)
+                      (forward-line)
+                      (point)))
+      (set-marker e (save-excursion
+                      (LaTeX-find-matching-end)
+                      (forward-line -1)
+                      (end-of-line)
+                      (point)))
+      ;; Delete the next 2 lines if you don't like indenting and removal
+      ;; of whitespaces:
+      (LaTeX-fill-environment nil)
+      (whitespace-cleanup-region s e)
+      (align-regexp s e "\\(\\s-*\\)&" 1 1 t)
+      (align-regexp s e "\\(\\s-*\\)\\\\\\\\")
+      (set-marker s nil)
+      (set-marker e nil))))
 
 (use-package markdown-mode
   :ensure t
@@ -398,10 +424,14 @@
 
 (use-package undo-tree
   :init
-  (global-undo-tree-mode))
+  (global-undo-tree-mode)
+  :config
+  (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo"))))
 
 (add-hook 'text-mode-hook 'turn-on-auto-fill)
 (setq-default auto-fill-function 'do-auto-fill)
+
+(use-package unfill)
 
 (defun mk/replace-char-under-cursor-with-char (new-char)
   (insert new-char)
@@ -425,11 +455,20 @@
 	  ((string= to-replace "s")
 	   (mk/replace-char-under-cursor-with-char "ß")))))
 
+(defun mk/space-end-2-1 ()
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward "\\.  \\([^ ]\\)" nil t)
+      (replace-match ". \\1" t))))
+
 (recentf-mode 1)
 (setq recentf-max-menu-items 25)
 (setq recentf-max-saved-items 25)
 
 (use-package rg)
+
+(use-package evil-iedit-state)
 
 (setq mac-option-modifier 'alt)
 (setq mac-command-modifier 'meta)
@@ -585,6 +624,7 @@
 (leader-set-keys-for-major-mode 'latex-mode "xi" 'latex/font-italic)
 (leader-set-keys-for-major-mode 'latex-mode "xc" 'latex/font-code)
 (leader-set-keys-for-major-mode 'latex-mode "xs" 'latex/font-small-caps)
+(leader-set-keys-for-major-mode 'latex-mode "t" 'mk/align-latex-table)
 
 (leader-set-keys
   "K" '(:ignore t :wk "macros")

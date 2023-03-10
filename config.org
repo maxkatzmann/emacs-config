@@ -405,11 +405,17 @@ Enable line numbers in Bibtex mode by default.
                               (setq display-line-numbers 'relative)))
 #+end_src
 
+Use ~org-ref~ to be able to sort bibtex entries.
+#+begin_src emacs-lisp
+(use-package org-ref)
+#+end_src
+
 ** Latex
 
 #+begin_src emacs-lisp
 (use-package tex
-  :straight auctex)
+  :straight auctex
+  :mode(("lua_.*" . LaTeX-mode)))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -484,6 +490,32 @@ In latex we want to adjust the fill-column.
 #+begin_src emacs-lisp
 (add-hook 'TeX-mode-hook (lambda ()
                            (setq fill-column 70)))
+#+end_src
+
+Function to align latex tables.
+#+begin_src emacs-lisp
+(defun mk/align-latex-table ()
+  (interactive)
+  (unless (string= (LaTeX-current-environment) "document")
+    (let ((s (make-marker))
+          (e (make-marker)))
+      (set-marker s (save-excursion
+                      (LaTeX-find-matching-begin)
+                      (forward-line)
+                      (point)))
+      (set-marker e (save-excursion
+                      (LaTeX-find-matching-end)
+                      (forward-line -1)
+                      (end-of-line)
+                      (point)))
+      ;; Delete the next 2 lines if you don't like indenting and removal
+      ;; of whitespaces:
+      (LaTeX-fill-environment nil)
+      (whitespace-cleanup-region s e)
+      (align-regexp s e "\\(\\s-*\\)&" 1 1 t)
+      (align-regexp s e "\\(\\s-*\\)\\\\\\\\")
+      (set-marker s nil)
+      (set-marker e nil))))
 #+end_src
 
 ** Markdown
@@ -647,13 +679,20 @@ Setup redo functionality.
 #+begin_src emacs-lisp
 (use-package undo-tree
   :init
-  (global-undo-tree-mode))
+  (global-undo-tree-mode)
+  :config
+  (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo"))))
 #+end_src
 
 Enable ~auto-fill~ by default.
 #+begin_src emacs-lisp
 (add-hook 'text-mode-hook 'turn-on-auto-fill)
 (setq-default auto-fill-function 'do-auto-fill)
+#+end_src
+
+Enable ~unfill~ functionality.
+#+begin_src emacs-lisp
+(use-package unfill)
 #+end_src
 
 Easily convert a char to the corresponding umlaut.
@@ -681,6 +720,16 @@ Easily convert a char to the corresponding umlaut.
 	   (mk/replace-char-under-cursor-with-char "ß")))))
 #+end_src
 
+Convert two-space sentence endings with one-space ones.
+#+begin_src emacs-lisp
+(defun mk/space-end-2-1 ()
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward "\\.  \\([^ ]\\)" nil t)
+      (replace-match ". \\1" t))))
+#+end_src
+
 ** Files
 Include recent files when switching between buffers.
 #+begin_src emacs-lisp
@@ -693,6 +742,12 @@ Use ripgrep for search!
 #+begin_src emacs-lisp
 (use-package rg)
 #+end_src
+
+Use iedit for search and replace.
+#+begin_src emacs-lisp
+(use-package evil-iedit-state)
+#+end_src
+
 * Keybindings
 
 #+begin_src emacs-lisp
@@ -929,6 +984,7 @@ Function to find the ~config.org~ file.
 (leader-set-keys-for-major-mode 'latex-mode "xi" 'latex/font-italic)
 (leader-set-keys-for-major-mode 'latex-mode "xc" 'latex/font-code)
 (leader-set-keys-for-major-mode 'latex-mode "xs" 'latex/font-small-caps)
+(leader-set-keys-for-major-mode 'latex-mode "t" 'mk/align-latex-table)
 #+end_src
 
 *** Macros
