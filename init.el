@@ -135,17 +135,18 @@
 (use-package company)
 (add-hook 'after-init-hook 'global-company-mode)
 (setq company-idle-delay 0.2)
-(setq company-dabbrev-downcase 'case-replace)
+(setq company-minimum-prefix-length 3)
+(setq company-dabbrev-downcase nil)
 
 (defun mk/company-backends-hook ()
   (interactive)
   (message "mk/ Hooking backends...")
   (setq company-backends
-  '((company-dabbrev
-     company-dabbrev-code
-     company-capf
+  '((company-capf
      company-files
      company-keywords
+     company-dabbrev-code
+     company-dabbrev
      company-clang
      company-gtags
      company-etags
@@ -167,11 +168,16 @@
 (use-package flyspell-correct
   :after flyspell)
 
+(add-hook 'text-mode-hook 'flyspell-mode)
+(add-hook 'prog-mode-hook 'flyspell-prog-mode)
+
+(setq ispell-dictionary "english")
+
 (use-package consult-flyspell
   :straight (consult-flyspell :type git :host gitlab :repo "OlMon/consult-flyspell" :branch "master")
   :config
   ;; default settings
-  (setq consult-flyspell-select-function 'flyspell-correct-at-point
+  (setq consult-flyspell-correct-function '(lambda () (flyspell-correct-at-point) (consult-flyspell))
         consult-flyspell-set-point-after-word t
         consult-flyspell-always-check-buffer nil))
 
@@ -251,8 +257,14 @@
                               (display-line-numbers-mode)
                               (setq display-line-numbers 'relative)))
 
+(use-package org-ref)
+
 (use-package tex
-  :straight auctex)
+  :straight auctex
+  :mode(("lua_.*" . LaTeX-mode)))
+
+(straight-use-package
+  '(consult-reftex :type git :host github :repo "karthink/consult-reftex"))
 
 (add-hook 'TeX-mode-hook 'eglot-ensure)
 
@@ -300,6 +312,29 @@
 (add-hook 'TeX-mode-hook (lambda ()
                            (setq fill-column 70)))
 
+(defun mk/align-latex-table ()
+  (interactive)
+  (unless (string= (LaTeX-current-environment) "document")
+    (let ((s (make-marker))
+          (e (make-marker)))
+      (set-marker s (save-excursion
+                      (LaTeX-find-matching-begin)
+                      (forward-line)
+                      (point)))
+      (set-marker e (save-excursion
+                      (LaTeX-find-matching-end)
+                      (forward-line -1)
+                      (end-of-line)
+                      (point)))
+      ;; Delete the next 2 lines if you don't like indenting and removal
+      ;; of whitespaces:
+      (LaTeX-fill-environment nil)
+      (whitespace-cleanup-region s e)
+      (align-regexp s e "\\(\\s-*\\)&" 1 1 t)
+      (align-regexp s e "\\(\\s-*\\)\\\\\\\\")
+      (set-marker s nil)
+      (set-marker e nil))))
+
 (use-package markdown-mode
   :ensure t
   :mode ("README\\.md\\'" . gfm-mode)
@@ -339,11 +374,24 @@
   :init
   (add-hook 'python-mode-hook 'eglot-ensure)) ;; Enable LSP in Python
 
+(use-package treesit-auto
+  :config
+  (setq treesit-auto-install 'prompt)
+  (global-treesit-auto-mode))
+
 (use-package eglot)
 
 (setq eglot-server-programs
   '((python-mode . ("pylsp"))
     (latex-mode . ("texlab"))))
+
+(use-package current-window-only
+  :straight (current-window-only
+             :type git
+             :host github
+             :repo "FrostyX/current-window-only")
+  :config
+  (current-window-only-mode))
 
 (defun split-and-follow-vertically ()
   (interactive)
@@ -384,11 +432,53 @@
 
 (setq-default evil-kill-on-visual-paste nil)
 
+(use-package undo-tree
+  :init
+  (global-undo-tree-mode)
+  :config
+  (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo"))))
+
+(add-hook 'text-mode-hook 'turn-on-auto-fill)
+(setq-default auto-fill-function 'do-auto-fill)
+
+(use-package unfill)
+
+(defun mk/replace-char-under-cursor-with-char (new-char)
+  (insert new-char)
+  (delete-char 1))
+
+(defun mk/convert-to-umlaut ()
+  (interactive)
+  (let ((to-replace (string (char-after))))
+    (cond ((string= to-replace "a")
+	   (mk/replace-char-under-cursor-with-char "ä"))
+	  ((string= to-replace "A")
+	   (mk/replace-char-under-cursor-with-char "Ä"))
+	  ((string= to-replace "o")
+	   (mk/replace-char-under-cursor-with-char "ö"))
+	  ((string= to-replace "O")
+	   (mk/replace-char-under-cursor-with-char "Ö"))
+	  ((string= to-replace "u")
+	   (mk/replace-char-under-cursor-with-char "ü"))
+	  ((string= to-replace "U")
+	   (mk/replace-char-under-cursor-with-char "Ü"))
+	  ((string= to-replace "s")
+	   (mk/replace-char-under-cursor-with-char "ß")))))
+
+(defun mk/space-end-2-1 ()
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward "\\.  \\([^ ]\\)" nil t)
+      (replace-match ". \\1" t))))
+
 (recentf-mode 1)
 (setq recentf-max-menu-items 25)
 (setq recentf-max-saved-items 25)
 
 (use-package rg)
+
+(use-package evil-iedit-state)
 
 (setq mac-option-modifier 'alt)
 (setq mac-command-modifier 'meta)
@@ -400,7 +490,8 @@
   (setq evil-want-keybinding nil) ;; Required for evil-collection
   (setq evil-want-visual-char-semi-exclusive t)
   :config
-  (evil-mode 1))
+  (evil-mode 1)
+  (evil-set-undo-system 'undo-tree))
 
 (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
 (define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line)
@@ -543,6 +634,7 @@
 (leader-set-keys-for-major-mode 'latex-mode "xi" 'latex/font-italic)
 (leader-set-keys-for-major-mode 'latex-mode "xc" 'latex/font-code)
 (leader-set-keys-for-major-mode 'latex-mode "xs" 'latex/font-small-caps)
+(leader-set-keys-for-major-mode 'latex-mode "t" 'mk/align-latex-table)
 
 (leader-set-keys
   "K" '(:ignore t :wk "macros")
@@ -577,7 +669,7 @@
   "xC" 'capitalize-word
   "xL" 'downcase-word
   "xT" 'titlecase-region
-  "xa" 'accent-menu
+  "xa" 'mk/convert-to-umlaut
   "xi" 'hydra-transient-special-characters/body
 )
 
