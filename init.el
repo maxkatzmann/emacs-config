@@ -136,7 +136,13 @@
 (add-hook 'after-init-hook 'global-company-mode)
 (setq company-idle-delay 0.2)
 (setq company-minimum-prefix-length 3)
-(setq company-dabbrev-downcase nil)
+(setq company-dabbrev-downcase 'case-replace)
+
+(defun mk/company-clear-on-empty-prefix (candidates)
+  (if (= (length company-prefix) 0)
+    nil
+    candidates))
+(setq company-transformers '(mk/company-clear-on-empty-prefix))
 
 (defun mk/company-backends-hook ()
   (interactive)
