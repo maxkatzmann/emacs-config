@@ -595,7 +595,7 @@
 (leader-set-keys
   "b" '(:ignore t :wk "buffers")
   "bb" 'consult-buffer
-  "bd" 'kill-this-buffer
+  "bd" 'kill-current-buffer
   "bn" 'next-buffer
   "bp" 'previous-buffer
   "bs" 'create-scratch-buffer
