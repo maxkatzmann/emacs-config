@@ -414,6 +414,12 @@
   :init
   (add-hook 'python-mode-hook 'eglot-ensure)) ;; Enable LSP in Python
 
+(use-package yapfify
+  :hook (python-mode . yapf-mode)
+  :config (setq yapfify-executable "~/.emacs.d/yapfify.sh"))
+
+(use-package ess)
+
 (use-package treesit-auto
   :config
   (setq treesit-auto-install 'prompt)
@@ -686,6 +692,8 @@
 
 (leader-set-keys-for-major-mode 'python-mode "c" 'compile)
 (leader-set-keys-for-major-mode 'python-mode "=" 'yapfify-buffer)
+
+(leader-set-keys-for-major-mode 'ess-r-mode "c" 'ess-eval-buffer)
 
 (leader-set-keys-for-major-mode 'shell-mode "h" 'consult-history)
 

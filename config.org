@@ -694,6 +694,18 @@ Use babel to convert this ~config.org~ file into the ~init.el~ file.
   (add-hook 'python-mode-hook 'eglot-ensure)) ;; Enable LSP in Python
 #+end_src
 
+For python formatting.  By default no executable for yapf is install
+under Debian. We create a script that acts as an executable for us.
+#+begin_src emacs-lisp
+(use-package yapfify
+  :hook (python-mode . yapf-mode)
+  :config (setq yapfify-executable "~/.emacs.d/yapfify.sh"))
+#+end_src
+
+** R
+#+begin_src emacs-lisp
+(use-package ess)
+#+end_src
 
 ** Tree Sitter
 Enable tree-sitter wherever possible.
@@ -1121,6 +1133,10 @@ Function to find the ~config.org~ file.
 (leader-set-keys-for-major-mode 'python-mode "=" 'yapfify-buffer)
 #+end_src
 
+*** R
+#+begin_src emacs-lisp
+(leader-set-keys-for-major-mode 'ess-r-mode "c" 'ess-eval-buffer)
+#+end_src
 *** Shell
 #+begin_src emacs-lisp
 (leader-set-keys-for-major-mode 'shell-mode "h" 'consult-history)
