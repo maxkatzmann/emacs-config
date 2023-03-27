@@ -494,6 +494,34 @@ Use ~org-ref~ to be able to sort bibtex entries.
 (use-package org-ref)
 #+end_src
 
+** C++
+Formatting
+#+begin_src emacs-lisp
+(use-package clang-format
+  :init (setq clang-format-style "google"))
+#+end_src
+
+Enable formatting on save
+#+begin_src emacs-lisp
+(defun mk/clang-format-save-hook-for-this-buffer ()
+  "Create a buffer local save hook."
+  (add-hook 'before-save-hook
+	    (lambda ()
+	      (clang-format-buffer)
+	      ;; Continue to save.
+	      nil)
+	    nil
+	    ;; Buffer local hook.
+	    t))
+
+(add-hook 'c-mode-hook (lambda () (mk/clang-format-save-hook-for-this-buffer)))
+(add-hook 'c++-mode-hook (lambda () (mk/clang-format-save-hook-for-this-buffer)))
+#+end_src
+
+** CSV
+#+begin_src emacs-lisp
+(use-package csv-mode)
+#+end_src
 ** Latex
 
 #+begin_src emacs-lisp
@@ -978,6 +1006,12 @@ thus commenting outside of the selected region.
   "c" '(:ignore t :wk "comment")
   "cl" 'comment-or-uncomment-region-or-line
 )
+#+end_src
+
+*** CSV
+#+begin_src emacs-lisp
+(leader-set-keys-for-major-mode 'csv-mode "a" 'csv-align-mode)
+(leader-set-keys-for-major-mode 'csv-mode "s" 'csv-set-separator)
 #+end_src
 
 *** Dired

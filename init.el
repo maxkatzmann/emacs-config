@@ -280,6 +280,25 @@
 
 (use-package org-ref)
 
+(use-package clang-format
+  :init (setq clang-format-style "google"))
+
+(defun mk/clang-format-save-hook-for-this-buffer ()
+  "Create a buffer local save hook."
+  (add-hook 'before-save-hook
+	    (lambda ()
+	      (clang-format-buffer)
+	      ;; Continue to save.
+	      nil)
+	    nil
+	    ;; Buffer local hook.
+	    t))
+
+(add-hook 'c-mode-hook (lambda () (mk/clang-format-save-hook-for-this-buffer)))
+(add-hook 'c++-mode-hook (lambda () (mk/clang-format-save-hook-for-this-buffer)))
+
+(use-package csv-mode)
+
 (use-package tex
   :straight auctex
   :mode(("lua_.*" . LaTeX-mode)))
@@ -590,6 +609,9 @@
   "c" '(:ignore t :wk "comment")
   "cl" 'comment-or-uncomment-region-or-line
 )
+
+(leader-set-keys-for-major-mode 'csv-mode "a" 'csv-align-mode)
+(leader-set-keys-for-major-mode 'csv-mode "s" 'csv-set-separator)
 
 (leader-set-keys
   "a" '(:ignore t :wk "applications")
