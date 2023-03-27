@@ -383,6 +383,30 @@ Use magit-delta for better diffing.
 (add-hook 'magit-mode-hook (lambda () (magit-delta-mode +1)))
 #+end_src
 
+Use hl-todo to highlight todos.
+
+#+begin_src emacs-lisp
+(use-package hl-todo
+    :init (setq global-hl-todo-mode t)
+          (setq hl-todo-keyword-faces
+            '(("TODO"   . "#FF0000")
+              ("\\todo"   . "#FF0000")
+              ("FIXME"  . "#FF0000")
+              ("DEBUG"  . "#A020F0")
+              ("GOTCHA" . "#FF4500")
+              ("STUB"   . "#1E90FF"))))
+#+end_src
+
+Use magit-todos to list todos in the magit status buffer.
+#+begin_src emacs-lisp
+(use-package magit-todos
+  :init (magit-todos-mode))
+#+end_src
+
+#+begin_src emacs-lisp
+
+#+end_src
+
 Display diff indicators in the gutter.
 #+begin_src emacs-lisp
 (use-package git-gutter

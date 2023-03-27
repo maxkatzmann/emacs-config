@@ -201,6 +201,21 @@
 (use-package magit-delta)
 (add-hook 'magit-mode-hook (lambda () (magit-delta-mode +1)))
 
+(use-package hl-todo
+    :init (setq global-hl-todo-mode t)
+          (setq hl-todo-keyword-faces
+            '(("TODO"   . "#FF0000")
+              ("\\todo"   . "#FF0000")
+              ("FIXME"  . "#FF0000")
+              ("DEBUG"  . "#A020F0")
+              ("GOTCHA" . "#FF4500")
+              ("STUB"   . "#1E90FF"))))
+
+(use-package magit-todos
+  :init (magit-todos-mode))
+
+
+
 (use-package git-gutter
   :config
   (add-hook 'prog-mode-hook (lambda () (git-gutter-mode)))
